@@ -11,7 +11,7 @@
 <br>
  
 * # *Repo Name* ---> **Image Occlusion Armanian Mod**
-* ## *Repo Description* ---> **This repo adds more features to Anki Image Occlusion Enhanced by glutanimate**
+* ## *Repo Description* ---> **This repo adds more features to "Image Occlusion Enhanced" addon by glutanimate for Anki SRS**
 * ### *Modified By* ---> **[#arman_bhaai](https://www.google.com/search?q=%23arman_bhaai&oq=%23arman_bhaai)** *(either click on this hashtag or make a google search to discover more about my works)*
 * ### *My Personal Portfolio* ---> **https://arman-bhaai.github.io** *(some of my great projects are listed on my portfolio, so make sure you went through this)*
 * ### *Find Me on Github* ---> **https://github.com/arman-bhaai**

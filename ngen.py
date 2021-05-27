@@ -1,3 +1,4 @@
+###@ mod finished
 # -*- coding: utf-8 -*-
 ####################################################
 ##                                                ##
@@ -71,7 +72,7 @@ class ImgOccNoteGenerator(object):
         self.qfill = '#' + mw.col.conf['imgocc_armod']['qfill']
         self.note_tp = note_tp
         loadConfig(self)
-        self.mconfig = self.mconfigs[self.note_tp]
+        self.mconfig = self.mconfigs[self.note_tp] # model config
 
     def generateNotes(self):
         """Generate new notes"""
@@ -235,7 +236,7 @@ class ImgOccNoteGenerator(object):
 
     def _findByNoteId(self, note_id):
         """Search collection for notes with given ID"""
-        query = '"%s:%s*"' % (self.ioflds['id'], note_id)
+        query = '"%s:%s*"' % (self.mconfig['ioflds']['id'], note_id)
         logging.debug("query %s", query)
         res = mw.col.findNotes(query)
         return res
@@ -246,7 +247,7 @@ class ImgOccNoteGenerator(object):
         res = self._findByNoteId(old_occl_id)
         self.nids = {}
         for nid in res:
-            note_id = mw.col.getNote(nid)[self.ioflds['id']]
+            note_id = mw.col.getNote(nid)[self.mconfig['ioflds']['id']]
             self.nids[note_id] = nid
         logging.debug('--------------------')
         logging.debug("res %s", res)

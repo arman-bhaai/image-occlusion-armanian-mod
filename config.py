@@ -204,7 +204,7 @@ def getLocalConfig():
     return mw.pm.profile["imgocc_armod"]
 
 
-def getOrCreateModel(model_map=DFLT_MODEL):
+def getOrCreateModel(model_map):
     model = mw.col.models.byName(model_map['name'])
     if not model:
         # create model and set up default field name config

@@ -81,7 +81,7 @@ def onImgOccButton(self, origin=None, image_path=None):
 
 def onSetupEditorButtons(buttons, editor):
     """Add IO button to Editor"""
-    conf = mw.pm.profile.get("imgocc")
+    conf = mw.pm.profile.get("imgocc_armod")
     if not conf:
         hotkey = IO_HOTKEY
     else:
@@ -90,10 +90,10 @@ def onSetupEditorButtons(buttons, editor):
     origin = getEdParentInstance(editor.parentWindow)
 
     if origin == "addcards":
-        tt = "Add Image Occlusion"
+        tt = "Add Image Occlusion ArMOD"
         icon_name = "add.png"
     else:
-        tt = "Edit Image Occlusion"
+        tt = "Edit Image Occlusion ArMOD"
         icon_name = "edit.png"
 
     icon = os.path.join(ICONS_PATH, icon_name)
@@ -152,7 +152,7 @@ def contextMenuEvent(self, evt):
         image_name = url.fileName()
         path = os.path.join(mw.col.media.dir(), image_name)
     if url.isValid() and path:
-        a = m.addAction(_("Occlude Image"))
+        a = m.addAction(_("Occlude Image ArMOD"))
         a.triggered.connect(
             lambda _, u=path, e=self.editor: onImgOccButton(e, image_path=u))
         a = m.addAction(_("Open Image"))
@@ -182,12 +182,12 @@ def onSetNote(self, note, hide=True, focus=False):
     if self.web is None:  # editor is in cleanup
         return
     # Conditionally set body CSS  class
-    if not (self.note and self.note.model()["name"] == IO_MODEL_NAMES):
+    if not (self.note and self.note.model()["name"] == DFLT_MODEL['name']):
         self.web.eval("""$("body").removeClass("ionote");""")
     else:
         # Only hide first field if it's the ID field
         # TODO? identify ID field HTML element automatically
-        if self.note.model()['flds'][0]['name'] == IO_FLDS['id']:
+        if self.note.model()['flds'][0]['name'] == DFLT_MODEL['flds']['id']:
             self.web.eval("""$("body").addClass("ionote-id");""")
         else:
             self.web.eval("""$("body").removeClass("ionote-id");""")
@@ -203,7 +203,7 @@ def onProfileLoaded():
     # Setup add-on config and templates, update if necessary
     getSyncedConfig()
     getLocalConfig()
-    getOrCreateModel()
+    getOrCreateModel(DFLT_MODEL)
 
 
 # Mask toggle hotkey
@@ -230,7 +230,7 @@ def newKeyHandler(self, evt):
 
 def onShowAnswer(self, _old):
     """Retain scroll position across answering the card"""
-    if not self.card or not self.card.model()["name"] == IO_MODEL_NAMES:
+    if not self.card or not self.card.model()["name"] == DFLT_MODEL['name']:
         return _old(self)
     if not ANKI21:
         scroll_pos = self.web.page().mainFrame().scrollPosition()

@@ -17,6 +17,9 @@
 Handles all minor utility dialogs
 """
 
+import logging
+logging.debug(f'Running: {__name__}')
+
 from aqt.qt import *
 from aqt import mw
 
@@ -236,3 +239,5 @@ def ioHelp(msgkey, title="Image Occlusion ArMOD Help",
     addHook("unloadProfile", onProfileUnload)
     mbox.finished.connect(lambda: remHook("unloadProfile", onProfileUnload))
     mbox.show()
+
+logging.debug(f'Exiting: {__name__}')

@@ -11,4 +11,9 @@ Copyright: (c) 2018 Glutanimate <https://glutanimate.com/>
 License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 """
 
+import logging
+logging.basicConfig(format='%(levelname)s: %(message)s', filename='debug.log', level=logging.DEBUG, filemode='w')
+logging.debug(f'Running: {__name__}')
 from . import main
+
+logging.debug(f'Exiting: {__name__}')

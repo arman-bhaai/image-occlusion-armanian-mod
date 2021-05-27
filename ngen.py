@@ -19,6 +19,7 @@ the collection.
 """
 
 import logging
+logging.debug(f'Running: {__name__}')
 
 from aqt.qt import *
 from aqt import mw
@@ -493,3 +494,5 @@ class IoGenOA(ImgOccNoteGenerator):
                 mask_node.setAttribute("class", "qshape")
             else:
                 mlayer_node.removeChild(mask_node)
+
+logging.debug(f'Exiting: {__name__}')

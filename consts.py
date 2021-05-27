@@ -8,6 +8,8 @@ Global variables
 Copyright: (c) 2018 Glutanimate <https://glutanimate.com/>
 License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 """
+import logging
+logging.debug(f'Running: {__name__}')
 
 import sys
 import os
@@ -30,3 +32,5 @@ SUPPORTED_EXTENSIONS = (
     SUPPORTED_BITMAP_FORMATS +
     SUPPORTED_VECTOR_FORMATS
 )
+
+logging.debug(f'Exiting: {__name__}')

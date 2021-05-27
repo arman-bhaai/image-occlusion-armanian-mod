@@ -15,6 +15,8 @@
 """
 Image Occlusion editor dialog
 """
+import logging
+logging.debug(f'Running: {__name__}')
 
 import os
 
@@ -443,3 +445,5 @@ class ImgOccEdit(QDialog):
                                svgCanvas.zoomChanged('', 'canvas');
                            }, 5)
                            """)
+
+logging.debug(f'Exiting: {__name__}')

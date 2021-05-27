@@ -15,8 +15,9 @@
 """
 Sets up buttons and menus and calls other modules.
 """
-
 import logging
+logging.debug(f'Running: {__name__}')
+
 import sys
 
 from anki.lang import _
@@ -35,9 +36,6 @@ from .config import *
 from .add import ImgOccAdd
 from .options import ImgOccOpts
 from .dialogs import ioHelp, ioCritical
-
-DEBUG_FILE_PATH = 'debug.log'
-logging.basicConfig(format='%(levelname)s: %(message)s', filename=DEBUG_FILE_PATH, level=logging.DEBUG, filemode='w')
 
 
 def onIoSettings():
@@ -270,3 +268,5 @@ if not ANKI21:
     Reviewer._keyHandler = wrap(Reviewer._keyHandler, newKeyHandler, "before")
 else:
     addHook("reviewStateShortcuts", onReviewerStateShortcuts)
+
+logging.debug(f'Exiting: {__name__}')

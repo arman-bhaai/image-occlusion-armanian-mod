@@ -15,6 +15,8 @@
 """
 Add notes.
 """
+import logging
+logging.debug(f'Running: {__name__}')
 
 import os
 import tempfile
@@ -383,3 +385,5 @@ class ImgOccAdd(object):
             fields[fn] = text
         tags = dialog.tags_edit.text().split()
         return (fields, tags)
+
+logging.debug(f'Exiting: {__name__}')

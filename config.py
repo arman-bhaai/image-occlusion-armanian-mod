@@ -11,6 +11,8 @@
 """
 Sets up configuration, including constants
 """
+import logging
+logging.debug(f'Running: {__name__}')
 
 # TODO: move constants to consts.py
 
@@ -211,7 +213,11 @@ def getOrCreateModel(model_map):
     if not model:
         # create model and set up default field name config
         model = template.add_io_model(mw.col, model_map)
+        logging.debug(f'mw.col.conf["imgocc_armod"]: {mw.col.conf["imgocc_armod"]}')
+        input('stop')
         mw.col.conf['imgocc_armod'] = {'models_map': model_map['short_name']}
+        logging.debug(f'mw.col.conf["imgocc_armod"]: {mw.col.conf["imgocc_armod"]}')
+        input('stop')
         mw.col.conf['imgocc_armod']['models_map'][model_map['short_name']] = \
                                   default_conf_syncd['io_models_map'][model_map['short_name']]
         return model
@@ -254,3 +260,5 @@ def loadConfig(self):
     self.sconf = getSyncedConfig()
     self.lconf = getLocalConfig()
     self.mconfigs = {i: getModelConfig(IO_MODELS_MAP[i]) for i in IO_MODELS_MAP.keys() } # model configs
+
+logging.debug(f'Exiting: {__name__}')

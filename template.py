@@ -17,6 +17,9 @@
 Handles the IO note type and card template
 """
 
+import logging
+logging.debug(f'Running: {__name__}')
+
 from .config import *
 from .config import IO_FLDS_OA, IO_FLDS_AO, IO_MODELS_MAP, DFLT_MODEL
 
@@ -417,17 +420,17 @@ iocard_css_oa = """\
 }
 """
 
-IO_MODELS_MAP['ao']['card1'].update({
-  'front': iocard_front_ao,
-  'back': iocard_back_ao,
-  'css': iocard_css_ao
-},)
+# IO_MODELS_MAP['ao']['card1'].update({
+#   'front': iocard_front_ao,
+#   'back': iocard_back_ao,
+#   'css': iocard_css_ao
+# },)
 
-IO_MODELS_MAP['oa']['card1'].update({
-  'front': iocard_front_oa,
-  'back': iocard_back_oa,
-  'css': iocard_css_oa
-},)
+# IO_MODELS_MAP['oa']['card1'].update({
+#   'front': iocard_front_oa,
+#   'back': iocard_back_oa,
+#   'css': iocard_css_oa
+# },)
 
 
 # INCREMENTAL UPDATES
@@ -471,6 +474,9 @@ additions_by_version = [
 def add_io_model(col, model_map):
     models = col.models
     io_model = models.new(model_map['name'])
+    logging.debug(f'models: {models}')
+    logging.debug(f'io_model: {io_model}')
+    logging.debug(f'model_map: {model_map}')
     # Add fields:
     for i in model_map['fld_ids']:
         fld = models.newField(model_map['flds'][i])
@@ -478,11 +484,12 @@ def add_io_model(col, model_map):
             fld['size'] = 0
         models.addField(io_model, fld)
     # Add template
-    template = models.newTemplate(model_map['card1'])
-    template['qfmt'] = model_map['card1']['front']
-    template['afmt'] = model_map['card1']['back']
-    io_model['css'] = model_map['card1']['css']
-    io_model['sortf'] = model_map['sort_fld']
+    template = models.newTemplate(model_map['card1']['name'])
+    template['qfmt'] = iocard_front_ao # model_map['card1']['front']
+    template['afmt'] = iocard_back_ao # model_map['card1']['back']
+    logging.debug(f'template: {template}')
+    io_model['css'] = iocard_css_ao # model_map['card1']['css']
+    io_model['sortf'] = 1 # model_map['sort_fld']
     models.addTemplate(io_model, template)
     models.add(io_model)
     return io_model
@@ -521,3 +528,5 @@ def update_template(col, old_version, model_map):
     io_model['css'] += "\n".join(additions[2])
     col.models.save()
     return io_model
+
+logging.debug(f'Exiting: {__name__}')

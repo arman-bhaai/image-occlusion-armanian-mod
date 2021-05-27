@@ -17,6 +17,7 @@ Main options dialog
 """
 
 import logging
+logging.debug(f'Running: {__name__}')
 
 from aqt.qt import *
 from aqt.utils import showInfo
@@ -379,3 +380,5 @@ class ImgOccOpts(QDialog):
     def onReject(self):
         """Dismiss changes on Close button press"""
         self.close()
+
+logging.debug(f'Exiting: {__name__}')

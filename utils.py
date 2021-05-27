@@ -11,6 +11,8 @@
 """
 Common reusable utilities
 """
+import logging
+logging.debug(f'Running: {__name__}')
 
 import os
 import re
@@ -112,3 +114,5 @@ def _svg_convert_size(size):
             return round(float(size[:-2]) * conversion_table[size[-2:]])
 
     return round(float(size))
+
+logging.debug(f'Exiting: {__name__}')

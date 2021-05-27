@@ -13,6 +13,7 @@ Makes older IO notes editable.
 """
 
 import logging
+logging.debug(f'Running: {__name__}')
 
 from aqt.qt import *
 from anki.hooks import addHook
@@ -245,3 +246,5 @@ def setupMenu(self):
 
 
 addHook("browser.setupMenus", setupMenu)
+
+logging.debug(f'Exiting: {__name__}')

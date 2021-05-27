@@ -124,7 +124,7 @@ class ImgOccOpts(QDialog):
         self.fsize_sel.setValue(int(config['fsize']))
         self.swidth_sel.setValue(int(config['swidth']))
         self.font_sel.setCurrentFont(QFont(config['font']))
-        self.skipped.setText(','.join(config["skip"]))
+        self.skipped.setText(','.join(config['io_models_map']['ao']["skip_flds"]))
 
     def setupUi(self):
         """Set up widgets and layouts"""

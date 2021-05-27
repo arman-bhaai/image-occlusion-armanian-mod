@@ -59,13 +59,13 @@ def onIoHelp():
 def onImgOccButton(self, origin=None, image_path=None):
     """Launch Image Occlusion Enhanced"""
     origin = origin or getEdParentInstance(self.parentWindow)
-    io_model = getOrCreateModel()
+    io_model = getOrCreateModel(DFLT_MODEL)
     if io_model:
         io_model_fields = mw.col.models.fieldNames(io_model)
-        if "imgocc" in mw.col.conf:
-            dflt_fields = list(mw.col.conf['imgocc']['flds'].values())
+        if "imgocc_armod" in mw.col.conf:
+            dflt_fields = list(mw.col.conf['imgocc_armod']['io_models_map']['ao']['flds'].values())
         else:
-            dflt_fields = list(IO_FLDS.values())
+            dflt_fields = list(IO_MODELS_MAP['ao']['flds'].values())
         # note type integrity check
         if not all(x in io_model_fields for x in dflt_fields):
             ioCritical("model_error", help="notetype",

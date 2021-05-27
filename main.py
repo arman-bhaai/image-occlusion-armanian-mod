@@ -36,7 +36,8 @@ from .add import ImgOccAdd
 from .options import ImgOccOpts
 from .dialogs import ioHelp, ioCritical
 
-logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
+RELATIVE_IO_ARMOD_PATH = 'addons21/image-occlusion-armanian-mod'
+logging.basicConfig(format='%(levelname)s: %(message)s', filename=f'{RELATIVE_IO_ARMOD_PATH}/debug.log', level=logging.DEBUG, filemode='w')
 
 
 def onIoSettings():
@@ -181,7 +182,7 @@ def onSetNote(self, note, hide=True, focus=False):
     if self.web is None:  # editor is in cleanup
         return
     # Conditionally set body CSS  class
-    if not (self.note and self.note.model()["name"] == IO_MODEL_NAME):
+    if not (self.note and self.note.model()["name"] == IO_MODEL_NAMES):
         self.web.eval("""$("body").removeClass("ionote");""")
     else:
         # Only hide first field if it's the ID field
@@ -229,7 +230,7 @@ def newKeyHandler(self, evt):
 
 def onShowAnswer(self, _old):
     """Retain scroll position across answering the card"""
-    if not self.card or not self.card.model()["name"] == IO_MODEL_NAME:
+    if not self.card or not self.card.model()["name"] == IO_MODEL_NAMES:
         return _old(self)
     if not ANKI21:
         scroll_pos = self.web.page().mainFrame().scrollPosition()
@@ -244,8 +245,8 @@ def onShowAnswer(self, _old):
 
 
 # Set up menus
-options_action = QAction("Image &Occlusion Enhanced Options...", mw)
-help_action = QAction("Image &Occlusion Enhanced...", mw)
+options_action = QAction("Image &Occlusion Armanian Mod Options...", mw)
+help_action = QAction("Image &Occlusion Armanian Mod...", mw)
 options_action.triggered.connect(onIoSettings)
 mw.addonManager.setConfigAction(__name__, onIoSettings)
 help_action.triggered.connect(onIoHelp)

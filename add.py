@@ -271,17 +271,17 @@ class ImgOccAdd(object):
                     """ % (bkgd_url, width, height))
         self.image_path = image_path
 
-    def onAddNotesButton(self, choice, close):
+    def onAddNotesButton(self, choice, close, note_type=''):
         dialog = self.imgoccedit
         dialog.svg_edit.evalWithCallback(
             "svgCanvas.svgCanvasToString();",
-            lambda val, choice=choice, close=close: self._onAddNotesButton(choice, close, val))
+            lambda val, choice=choice, close=close, note_type=note_type: self._onAddNotesButton(choice, close, val, note_type))
 
-    def _onAddNotesButton(self, choice, close, svg):
+    def _onAddNotesButton(self, choice, close, svg, note_type):
         """Get occlusion settings in and pass them to the note generator (add)"""
         dialog = self.imgoccedit
 
-        r1 = self.getUserInputs(dialog)
+        r1 = self.getUserInputs(dialog, note_type)
         if r1 is False:
             return False
         (fields, tags) = r1
@@ -364,7 +364,7 @@ class ImgOccAdd(object):
 
         mw.reset()  # FIXME: causes glitches in editcurrent mode
 
-    def getUserInputs(self, dialog, edit=False):
+    def getUserInputs(self, dialog, edit=False, note_type=''):
         """Get fields and tags from ImgOccEdit while checking note type"""
         fields = {}
         # note type integrity check:

@@ -285,10 +285,10 @@ class ImgOccEdit(QDialog):
             self.editNote()
 
     def addAO(self, close=False):
-        self.imgoccadd.onAddNotesButton("ao", close)
+        self.imgoccadd.onAddNotesButton("ao", close, 'ao')
 
     def addOA(self, close=False):
-        self.imgoccadd.onAddNotesButton("oa", close)
+        self.imgoccadd.onAddNotesButton("oa", close, 'oa')
 
     def new(self, close=False):
         choice = self.occl_tp_select.currentText()
@@ -366,7 +366,7 @@ class ImgOccEdit(QDialog):
             for i in hide_on_edit:
                 i.show()
             dl_txt = "Deck"
-            ttl = "Image Occlusion Enhanced - Add Mode"
+            ttl = "Image Occlusion ArMOD - Add Mode"
             bl_txt = "Add Cards:"
         else:
             for i in hide_on_add:
@@ -378,7 +378,7 @@ class ImgOccEdit(QDialog):
                     self.tedit[i].hide()
                     self.tlabel[i].hide()
             dl_txt = "Deck for <i>Add new cards</i>"
-            ttl = "Image Occlusion Enhanced - Editing Mode"
+            ttl = "Image Occlusion ArMOD - Editing Mode"
             bl_txt = "Type:"
         self.deckChooser.deckLabel.setText(dl_txt)
         self.setWindowTitle(ttl)

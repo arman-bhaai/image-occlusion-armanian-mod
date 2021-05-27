@@ -188,7 +188,7 @@ class ImgOccAdd(object):
         bkgd_url = path2url(self.image_path)
         opref = self.opref
         onote = self.ed.note
-        flds = self.mflds
+        flds = self.mconfigs[self.note_tp]['mflds']
         deck = mw.col.decks.nameOrNone(opref["did"])
 
         dialog = ImgOccEdit(self, self.ed.parentWindow)

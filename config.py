@@ -226,7 +226,7 @@ def getOrCreateModel(model_map):
 def getModelConfig(model_map):
     model = getOrCreateModel(model_map)
     mflds = model['flds']
-    ioflds = mw.col.conf['imgocc_armod']['models_map'][model_map['short_name']]['flds']
+    ioflds = mw.col.conf['imgocc_armod']['io_models_map'][model_map['short_name']]['flds']
     ioflds_priv = []
     for i in model_map['io_fids_priv']:
         ioflds_priv.append(ioflds[i])

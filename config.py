@@ -184,7 +184,7 @@ def getSyncedConfig():
         mw.col.conf['imgocc_armod'] = default_conf_syncd
         mw.col.setMod()
 
-    elif mw.col.conf['imgocc_armod']['version'] < default_conf_syncd['version_armod']:
+    elif mw.col.conf['imgocc_armod']['version'] < default_conf_syncd['version']:
         print("Updating config DB from earlier IO release")
         for key in list(default_conf_syncd.keys()):
             if key not in mw.col.conf['imgocc_armod']:
@@ -213,13 +213,9 @@ def getOrCreateModel(model_map):
     if not model:
         # create model and set up default field name config
         model = template.add_io_model(mw.col, model_map)
-        logging.debug(f'mw.col.conf["imgocc_armod"]: {mw.col.conf["imgocc_armod"]}')
-        input('stop')
-        mw.col.conf['imgocc_armod'] = {'models_map': model_map['short_name']}
-        logging.debug(f'mw.col.conf["imgocc_armod"]: {mw.col.conf["imgocc_armod"]}')
-        input('stop')
-        mw.col.conf['imgocc_armod']['models_map'][model_map['short_name']] = \
+        mw.col.conf['imgocc_armod']['io_models_map'][model_map['short_name']] = \
                                   default_conf_syncd['io_models_map'][model_map['short_name']]
+        logging.debug(f'mw.col.conf["imgocc_armod"]: {mw.col.conf["imgocc_armod"]}')
         return model
     model_version = mw.col.conf['imgocc_armod']['version']
     if model_version < default_conf_syncd['version']:

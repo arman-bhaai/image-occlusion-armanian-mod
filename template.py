@@ -18,6 +18,7 @@ Handles the IO note type and card template
 """
 
 from .config import *
+from .config import IO_FLDS_OA, IO_FLDS_AO, IO_MODELS_MAP, DFLT_MODEL
 
 # DEFAULT CARD TEMPLATES
 iocard_front_ao = """\
@@ -415,6 +416,19 @@ iocard_css_oa = """\
   font-size: 0.8em;
 }
 """
+
+IO_MODELS_MAP['ao']['card1'].update({
+  'front': iocard_front_ao,
+  'back': iocard_back_ao,
+  'css': iocard_css_ao
+},)
+
+IO_MODELS_MAP['oa']['card1'].update({
+  'front': iocard_front_oa,
+  'back': iocard_back_oa,
+  'css': iocard_css_oa
+},)
+
 
 # INCREMENTAL UPDATES
 

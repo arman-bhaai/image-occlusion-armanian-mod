@@ -18,9 +18,11 @@ import os
 import sys
 
 from aqt import mw
-from .template import *
+# from .template import *
+# from .template import iocard_front_ao, iocard_back_ao, iocard_css_ao, iocard_front_oa, iocard_back_oa, iocard_css_oa
 
 global IO_HOME, IO_HOTKEY
+global IO_FLDS_OA, IO_FLDS_AO
 
 # IO_MODEL_NAME = "Image Occlusion Enhanced"
 # IO_CARD_NAME = "IO Card"
@@ -68,9 +70,9 @@ IO_MODELS_MAP = {
         },
         'card1': {
             'name': 'IO ArMOD Card AO',
-            'front': iocard_front_ao,
-            'back': iocard_back_ao,
-            'css': iocard_css_ao
+            'front': '',
+            'back': '',
+            'css': ''
         },
         'skip_flds': ['e1', 'e2'],
         'io_fids_priv': ['id', 'im', 'qm', 'am', 'om'], # fields that aren't user-editable
@@ -97,9 +99,9 @@ IO_MODELS_MAP = {
         },
         'card1': {
             'name': 'IO ArMOD Card OA',
-            'front': iocard_front_oa,
-            'back': iocard_back_oa,
-            'css': iocard_css_oa
+            'front': '',
+            'back': '',
+            'css': ''
         },
         'skip_flds': ['e1', 'e2'],
         'io_fids_priv': ['id', 'im', 'qm', 'am', 'om'], # fields that aren't user-editable
@@ -149,7 +151,7 @@ IO_FLDS_OA = IO_MODELS_MAP['oa']['flds']
 # IO_FIDS_PRSV = ['sc']
 
 
-
+from .template import *
 
 # variables for local preference handling
 sys_encoding = sys.getfilesystemencoding()

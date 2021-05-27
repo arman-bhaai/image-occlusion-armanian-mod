@@ -36,8 +36,8 @@ from .add import ImgOccAdd
 from .options import ImgOccOpts
 from .dialogs import ioHelp, ioCritical
 
-RELATIVE_IO_ARMOD_PATH = 'addons21/image-occlusion-armanian-mod'
-logging.basicConfig(format='%(levelname)s: %(message)s', filename=f'{RELATIVE_IO_ARMOD_PATH}/debug.log', level=logging.DEBUG, filemode='w')
+DEBUG_FILE_PATH = 'debug.log'
+logging.basicConfig(format='%(levelname)s: %(message)s', filename=DEBUG_FILE_PATH, level=logging.DEBUG, filemode='w')
 
 
 def onIoSettings():

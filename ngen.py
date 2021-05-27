@@ -48,11 +48,11 @@ def genByKey(key, old_occl_tp=None):
     if key in ["Don't Change"]:
         return genByKey(old_occl_tp, None)
     elif key in ["ao", "Hide All, Guess One"]:
-        return IoGenHideAllRevealOne
+        return IoGenAO
     elif key in ["oa", "Hide One, Guess One"]:
         return IoGenHideOneRevealAll
     else:
-        return IoGenHideAllRevealOne
+        return IoGenOA
 
 
 class ImgOccNoteGenerator(object):
@@ -68,7 +68,7 @@ class ImgOccNoteGenerator(object):
         self.tags = tags
         self.fields = fields
         self.did = did
-        self.qfill = '#' + mw.col.conf['imgocc']['qfill']
+        self.qfill = '#' + mw.col.conf['imgocc_armod']['qfill']
         loadConfig(self)
 
     def generateNotes(self):
@@ -449,7 +449,7 @@ class ImgOccNoteGenerator(object):
 
 # Different generator subclasses for different occlusion types:
 
-class IoGenHideAllRevealOne(ImgOccNoteGenerator):
+class IoGenAO(ImgOccNoteGenerator):
     """
     Q: All hidden, one prompted for. A: One revealed
     ('nonoverlapping' / "Hide all, guess one")
@@ -468,7 +468,7 @@ class IoGenHideAllRevealOne(ImgOccNoteGenerator):
             mlayer_node.removeChild(mask_node)
 
 
-class IoGenHideOneRevealAll(ImgOccNoteGenerator):
+class IoGenOA(ImgOccNoteGenerator):
     """
     Q: One hidden, one prompted for. A: All revealed
     ("overlapping" / "Hide one, guess one")

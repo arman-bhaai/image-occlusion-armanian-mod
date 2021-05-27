@@ -18,7 +18,7 @@ import os
 import sys
 
 from aqt import mw
-from .template import iocard_front_ao, iocard_back_ao, iocard_front_oa, iocard_back_oa, iocard_css_ao, iocard_css_oa
+from .template import *
 
 global IO_HOME, IO_HOTKEY
 

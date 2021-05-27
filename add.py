@@ -51,13 +51,15 @@ svg_edit_queryitems = [('initStroke[opacity]', '1'),
 
 
 class ImgOccAdd(object):
-    def __init__(self, editor, origin, oldimg=None):
+    def __init__(self, editor, origin, oldimg=None, model_map=None):
         self.ed = editor
         self.image_path = oldimg
         self.mode = "add"
         self.origin = origin
         self.opref = {}  # original io session preference
         loadConfig(self)
+        self.model_map = model_map
+        self.mconfig = self.mconfigs[model_map['short_name']]
 
     def occlude(self, image_path=None):
 
@@ -110,9 +112,9 @@ class ImgOccAdd(object):
     def getIONoteData(self, note):
         """Select image based on mode and set original field contents"""
 
-        note_id = note[self.ioflds['id']]
-        image_path = img2path(note[self.ioflds['im']])
-        omask = img2path(note[self.ioflds['om']])
+        note_id = note[self.mconfig['ioflds']['id']]
+        image_path = img2path(note[self.mconfig['ioflds']['im']])
+        omask = img2path(note[self.mconfig['ioflds']['om']])
 
         if note_id is None or note_id.count("-") != 2:
             msg = "Editing unavailable: Invalid image occlusion Note ID"
@@ -188,10 +190,10 @@ class ImgOccAdd(object):
         bkgd_url = path2url(self.image_path)
         opref = self.opref
         onote = self.ed.note
-        flds = self.mconfigs[self.note_tp]['mflds']
+        flds = self.mconfig['mflds']
         deck = mw.col.decks.nameOrNone(opref["did"])
 
-        dialog = ImgOccEdit(self, self.ed.parentWindow)
+        dialog = ImgOccEdit(self, self.ed.parentWindow, self.model_map)
         dialog.setupFields(flds)
         dialog.switchToMode(self.mode)
         self.imgoccedit = dialog

@@ -16,6 +16,8 @@
 Sets up buttons and menus and calls other modules.
 """
 import logging
+
+from anki import models
 logging.debug(f'Running: {__name__}')
 
 import sys
@@ -73,7 +75,7 @@ def onImgOccButton(self, origin=None, image_path=None):
         oldimg = self.imgoccadd.image_path
     except AttributeError:
         oldimg = None
-    self.imgoccadd = ImgOccAdd(self, origin, oldimg)
+    self.imgoccadd = ImgOccAdd(self, origin, oldimg, DFLT_MODEL)
     self.imgoccadd.occlude(image_path)
 
 

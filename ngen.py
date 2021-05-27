@@ -60,7 +60,7 @@ class ImgOccNoteGenerator(object):
 
     stripattr = ['opacity', 'stroke-opacity', 'fill-opacity']
 
-    def __init__(self, ed, svg, image_path, opref, tags, fields, did):
+    def __init__(self, ed, svg, image_path, opref, tags, fields, did, note_tp):
         self.ed = ed
         self.new_svg = svg
         self.image_path = image_path
@@ -69,6 +69,7 @@ class ImgOccNoteGenerator(object):
         self.fields = fields
         self.did = did
         self.qfill = '#' + mw.col.conf['imgocc_armod']['qfill']
+        self.note_tp = note_tp
         loadConfig(self)
 
     def generateNotes(self):
@@ -413,19 +414,20 @@ class ImgOccNoteGenerator(object):
                                img, note_id, nid=None):
         """Write actual note for given qmask and amask"""
         fields = self.fields
-        model = self.model
-        mflds = self.mflds
-        fields[self.ioflds['im']] = img
+        model = self.mconfigs[self.note_tp]['model']
+        mflds = self.mconfigs[self.note_tp]['mflds']
+        ioflds = self.mconfigs[self.note_tp]['ioflds']
+        fields[ioflds['im']] = img
         if omask_path:
             # Occlusions updated
             qmask_path = self._saveMask(qmask, note_id, "Q")
             amask_path = self._saveMask(amask, note_id, "A")
-            fields[self.ioflds['qm']] = fname2img(qmask_path)
-            fields[self.ioflds['am']] = fname2img(amask_path)
-            fields[self.ioflds['om']] = fname2img(omask_path)
-            fields[self.ioflds['id']] = note_id
+            fields[ioflds['qm']] = fname2img(qmask_path)
+            fields[ioflds['am']] = fname2img(amask_path)
+            fields[ioflds['om']] = fname2img(omask_path)
+            fields[ioflds['id']] = note_id
 
-        self.model['did'] = self.did
+        model['did'] = self.did
         if nid:
             note = mw.col.getNote(nid)
         else:
@@ -457,6 +459,7 @@ class IoGenAO(ImgOccNoteGenerator):
     occl_tp = "ao"
 
     def __init__(self, ed, svg, image_path, opref, tags, fields, did):
+        self.note_tp = 'ao'
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path,
                                      opref, tags, fields, did)
 
@@ -476,6 +479,7 @@ class IoGenOA(ImgOccNoteGenerator):
     occl_tp = "oa"
 
     def __init__(self, ed, svg, image_path, opref, tags, fields, did):
+        self.note_tp = 'oa'
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path,
                                      opref, tags, fields, did)
 

@@ -50,9 +50,9 @@ def genByKey(key, old_occl_tp=None):
     elif key in ["ao", "Hide All, Guess One"]:
         return IoGenAO
     elif key in ["oa", "Hide One, Guess One"]:
-        return IoGenHideOneRevealAll
-    else:
         return IoGenOA
+    else:
+        return IoGenAO
 
 
 class ImgOccNoteGenerator(object):
@@ -71,6 +71,7 @@ class ImgOccNoteGenerator(object):
         self.qfill = '#' + mw.col.conf['imgocc_armod']['qfill']
         self.note_tp = note_tp
         loadConfig(self)
+        self.mconfig = self.mconfigs[self.note_tp]
 
     def generateNotes(self):
         """Generate new notes"""
@@ -414,9 +415,9 @@ class ImgOccNoteGenerator(object):
                                img, note_id, nid=None):
         """Write actual note for given qmask and amask"""
         fields = self.fields
-        model = self.mconfigs[self.note_tp]['model']
-        mflds = self.mconfigs[self.note_tp]['mflds']
-        ioflds = self.mconfigs[self.note_tp]['ioflds']
+        model = self.mconfig['model']
+        mflds = self.mconfig['mflds']
+        ioflds = self.mconfig['ioflds']
         fields[ioflds['im']] = img
         if omask_path:
             # Occlusions updated

@@ -201,12 +201,12 @@ class ImgOccOpts(QDialog):
         row = 7
         clm = 0
         self.lnedit = {}
-        for key in IO_FLDS_IDS:
+        for key in DFLT_MODEL['fld_ids']:
             if row == 13:  # switch to right columns
                 clm = 3
                 row = 7
-            default_name = self.sconf_dflt['flds'][key]
-            current_name = self.sconf['flds'][key]
+            default_name = self.sconf_dflt['io_models_map']['ao']['flds'][key]
+            current_name = self.sconf['io_models_map']['ao']['flds'][key]
             lb = QLabel(default_name)
             lb.setTextInteractionFlags(Qt.TextSelectableByMouse)
             t = QLineEdit()
@@ -307,7 +307,7 @@ class ImgOccOpts(QDialog):
         """Restore colors and fields back to defaults"""
         self.hotkey = self.lconf_dflt["hotkey"]
         for key in list(self.lnedit.keys()):
-            self.lnedit[key].setText(IO_FLDS[key])
+            self.lnedit[key].setText(IO_MODELS_MAP['ao']['flds'][key])
             self.lnedit[key].setModified(True)
         self.setupValues(self.sconf_dflt)
         self.ofill = self.sconf_dflt["ofill"]
@@ -317,19 +317,19 @@ class ImgOccOpts(QDialog):
     def renameFields(self):
         """Check for modified names and rename fields accordingly"""
         modified = False
-        model = getOrCreateModel()
+        model = getOrCreateModel(DFLT_MODEL)
         flds = model['flds']
         for key in list(self.lnedit.keys()):
             if not self.lnedit[key].isModified():
                 continue
             name = self.lnedit[key].text()
-            oldname = mw.col.conf['imgocc']['flds'][key]
+            oldname = mw.col.conf['imgocc_armod']['io_models_map']['ao']['flds'][key]
             if (name is None or not name.strip() or name == oldname):
                 continue
             fnames = mw.col.models.fieldNames(model)
             if (name in fnames and oldname not in fnames):
                 # case: imported cards, fields not corresponding to config
-                mw.col.conf['imgocc']['flds'][key] = name
+                mw.col.conf['imgocc_armod']['io_models_map']['ao']['flds'][key] = name
                 modified = True
                 continue
             idx = fnames.index(oldname)
@@ -338,7 +338,7 @@ class ImgOccOpts(QDialog):
                 # rename note type fields
                 mw.col.models.renameField(model, fld, name)
                 # update imgocc field-id <-> field-name assignment
-                mw.col.conf['imgocc']['flds'][key] = name
+                mw.col.conf['imgocc_armod']['io_models_map']['ao']['flds'][key] = name
                 modified = True
                 logging.debug("Renamed %s to %s", oldname, name)
         if modified:
@@ -356,14 +356,14 @@ class ImgOccOpts(QDialog):
             return
         if modified and hasattr(mw, "ImgOccEdit"):
             self.resetIoEditor(flds)
-        mw.col.conf['imgocc']['ofill'] = self.ofill
-        mw.col.conf['imgocc']['qfill'] = self.qfill
-        mw.col.conf['imgocc']['scol'] = self.scol
-        mw.col.conf['imgocc']['swidth'] = self.swidth_sel.value()
-        mw.col.conf['imgocc']['fsize'] = self.fsize_sel.value()
-        mw.col.conf['imgocc']['font'] = self.font_sel.currentFont().family()
-        mw.col.conf['imgocc']['skip'] = self.skipped.text().split(',')
-        mw.pm.profile["imgocc"]["hotkey"] = self.hotkey
+        mw.col.conf['imgocc_armod']['ofill'] = self.ofill
+        mw.col.conf['imgocc_armod']['qfill'] = self.qfill
+        mw.col.conf['imgocc_armod']['scol'] = self.scol
+        mw.col.conf['imgocc_armod']['swidth'] = self.swidth_sel.value()
+        mw.col.conf['imgocc_armod']['fsize'] = self.fsize_sel.value()
+        mw.col.conf['imgocc_armod']['font'] = self.font_sel.currentFont().family()
+        mw.col.conf['imgocc_armod']['io_models_map']['ao']['skip'] = self.skipped.text().split(',')
+        mw.pm.profile["imgocc_armod"]["hotkey"] = self.hotkey
         mw.col.setMod()
         self.close()
 

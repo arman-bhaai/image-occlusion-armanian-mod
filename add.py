@@ -281,7 +281,7 @@ class ImgOccAdd(object):
         """Get occlusion settings in and pass them to the note generator (add)"""
         dialog = self.imgoccedit
 
-        r1 = self.getUserInputs(dialog, note_type)
+        r1 = self.getUserInputs(dialog, IO_MODELS_MAP[note_type], self.mconfigs[note_type])
         if r1 is False:
             return False
         (fields, tags) = r1
@@ -364,19 +364,20 @@ class ImgOccAdd(object):
 
         mw.reset()  # FIXME: causes glitches in editcurrent mode
 
-    def getUserInputs(self, dialog, edit=False, note_type=''):
+    def getUserInputs(self, dialog, model_map, model_config, edit=False):
         """Get fields and tags from ImgOccEdit while checking note type"""
         fields = {}
         # note type integrity check:
-        io_model_fields = mw.col.models.fieldNames(self.model)
-        if not all(x in io_model_fields for x in list(self.ioflds.values())):
+        io_model_fields = mw.col.models.fieldNames(model_config['model'])
+        if not all(x in io_model_fields for x in list(model_config['ioflds'].values())):
             ioCritical("model_error", help="notetype", parent=dialog)
             return False
-        for i in self.mflds:
+        for i in model_config['mflds']:
             fn = i['name']
-            if fn in self.ioflds_priv:
+            if fn in model_config['ioflds_priv']:
                 continue
-            if edit and fn in self.sconf["skip"]:
+            skip_flds = self.sconf['io_models_map'][model_map['short_name']]['skip_flds']
+            if edit and fn in skip_flds:
                 continue
             text = dialog.tedit[fn].toPlainText().replace('\n', '<br />')
             fields[fn] = text

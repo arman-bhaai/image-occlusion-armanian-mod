@@ -251,4 +251,4 @@ def loadConfig(self):
     self.lconf_dflt = default_conf_local
     self.sconf = getSyncedConfig()
     self.lconf = getLocalConfig()
-    mconfigs = {i: getModelConfig(IO_MODELS_MAP[i]) for i in IO_MODELS_MAP.keys() }
+    self.mconfigs = {i: getModelConfig(IO_MODELS_MAP[i]) for i in IO_MODELS_MAP.keys() } # model configs

@@ -1,4 +1,3 @@
-###@ mod finished
 # -*- coding: utf-8 -*-
 ####################################################
 ##                                                ##
@@ -21,7 +20,7 @@ import logging
 logging.debug(f'Running: {__name__}')
 
 from .config import *
-from .config import IO_FLDS_OA, IO_FLDS_AO, IO_MODELS_MAP, DFLT_MODEL
+from .config import IO_FLDS_OA, IO_FLDS_AO, DFLT_MODEL
 
 # DEFAULT CARD TEMPLATES
 iocard_front_ao = """\

@@ -238,7 +238,7 @@ def getModelConfig(model_map):
             ioflds_prsv.append(fname)
     
     mconfig = {
-        'mode': model,
+        'model': model,
         'mflds': mflds,
         'ioflds': ioflds,
         'ioflds_priv': ioflds_priv,

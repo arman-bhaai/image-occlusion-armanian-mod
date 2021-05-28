@@ -215,7 +215,7 @@ class ImgOccAdd(object):
             items.addQueryItem('initTool', 'select'),
             for i in flds:
                 fn = i["name"]
-                if fn in self.ioflds_priv:
+                if fn in self.mconfig['ioflds_priv']:
                     continue
                 dialog.tedit[fn].setPlainText(
                     onote[fn].replace('<br />', '\n'))
@@ -231,7 +231,7 @@ class ImgOccAdd(object):
         dialog.tags_edit.setText(opref["tags"])
 
         if onote:
-            for i in self.ioflds_prsv:
+            for i in self.mconfig['ioflds_prsv']:
                 if i in onote:
                     dialog.tedit[i].setPlainText(onote[i])
 
@@ -275,17 +275,17 @@ class ImgOccAdd(object):
                     """ % (bkgd_url, width, height))
         self.image_path = image_path
 
-    def onAddNotesButton(self, choice, close, note_type=''):
+    def onAddNotesButton(self, choice, close, note_tp=''):
         dialog = self.imgoccedit
         dialog.svg_edit.evalWithCallback(
             "svgCanvas.svgCanvasToString();",
-            lambda val, choice=choice, close=close, note_type=note_type: self._onAddNotesButton(choice, close, val, note_type))
+            lambda val, choice=choice, close=close, note_tp=note_tp: self._onAddNotesButton(choice, close, val, note_tp))
 
-    def _onAddNotesButton(self, choice, close, svg, note_type):
+    def _onAddNotesButton(self, choice, close, svg, note_tp):
         """Get occlusion settings in and pass them to the note generator (add)"""
         dialog = self.imgoccedit
 
-        r1 = self.getUserInputs(dialog, IO_MODELS_MAP[note_type], self.mconfigs[note_type])
+        r1 = self.getUserInputs(dialog, IO_MODELS_MAP[note_tp], self.mconfigs[note_tp])
         if r1 is False:
             return False
         (fields, tags) = r1
@@ -293,7 +293,7 @@ class ImgOccAdd(object):
 
         noteGenerator = genByKey(choice)
         gen = noteGenerator(self.ed, svg, self.image_path,
-                            self.opref, tags, fields, did)
+                            self.opref, tags, fields, did, note_tp)
         r = gen.generateNotes()
         if r is False:
             return False
@@ -302,7 +302,7 @@ class ImgOccAdd(object):
             # Update Editor with modified tags and sources field
             self.ed.tags.setText(" ".join(tags))
             self.ed.saveTags()
-            ioflds_prsv = mw.col.conf['imgocc_armod']['io_models_map'][note_type]['ioflds_prsv']
+            ioflds_prsv = mw.col.conf['imgocc_armod']['io_models_map'][note_tp]['ioflds_prsv']
             for i in ioflds_prsv:
                 if i in self.ed.note:
                     self.ed.note[i] = fields[i]

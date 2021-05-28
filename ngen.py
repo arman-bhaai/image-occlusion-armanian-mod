@@ -461,10 +461,10 @@ class IoGenAO(ImgOccNoteGenerator):
     """
     occl_tp = "ao"
 
-    def __init__(self, ed, svg, image_path, opref, tags, fields, did):
+    def __init__(self, ed, svg, image_path, opref, tags, fields, did, note_tp):
         self.note_tp = 'ao'
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path,
-                                     opref, tags, fields, did)
+                                     opref, tags, fields, did, note_tp)
 
     def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
         mask_node = mlayer_node.childNodes[mask_node_index]
@@ -481,10 +481,10 @@ class IoGenOA(ImgOccNoteGenerator):
     """
     occl_tp = "oa"
 
-    def __init__(self, ed, svg, image_path, opref, tags, fields, did):
+    def __init__(self, ed, svg, image_path, opref, tags, fields, did, note_tp):
         self.note_tp = 'oa'
         ImgOccNoteGenerator.__init__(self, ed, svg, image_path,
-                                     opref, tags, fields, did)
+                                     opref, tags, fields, did, note_tp)
 
     def _createMaskAtLayernode(self, side, mask_node_index, mlayer_node):
         for i in reversed(self.mnode_indexes):

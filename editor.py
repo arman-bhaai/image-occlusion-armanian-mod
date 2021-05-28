@@ -87,6 +87,8 @@ class ImgOccEdit(QDialog):
         self.parent = parent
         self.mode = "add"
         loadConfig(self)
+        self.model_map = model_map
+        self.mconfig = self.mconfigs[model_map['short_name']]
         self.setupUi()
         restoreGeom(self, "imgoccedit")
         addHook("unloadProfile", self.onProfileUnload)
@@ -331,7 +333,7 @@ class ImgOccEdit(QDialog):
         self.tlabel = {}
         self.flds = flds
         for i in flds:
-            if i['name'] in self.ioflds_priv:
+            if i['name'] in self.mconfig['ioflds_priv']:
                 continue
             hbox = QHBoxLayout()
             tedit = QPlainTextEdit()

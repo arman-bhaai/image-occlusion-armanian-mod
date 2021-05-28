@@ -302,7 +302,8 @@ class ImgOccAdd(object):
             # Update Editor with modified tags and sources field
             self.ed.tags.setText(" ".join(tags))
             self.ed.saveTags()
-            for i in self.ioflds_prsv:
+            ioflds_prsv = mw.col.conf['imgocc_armod']['io_models_map'][note_type]['ioflds_prsv']
+            for i in ioflds_prsv:
                 if i in self.ed.note:
                     self.ed.note[i] = fields[i]
             self.ed.loadNote()

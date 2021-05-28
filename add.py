@@ -321,17 +321,17 @@ class ImgOccAdd(object):
 
         mw.reset()
 
-    def onEditNotesButton(self, choice):
+    def onEditNotesButton(self, choice, note_tp):
         dialog = self.imgoccedit
         dialog.svg_edit.evalWithCallback(
             "svgCanvas.svgCanvasToString();",
-            lambda val, choice=choice: self._onEditNotesButton(choice, val))
+            lambda val, choice=choice: self._onEditNotesButton(choice, val, note_tp))
 
-    def _onEditNotesButton(self, choice, svg):
+    def _onEditNotesButton(self, choice, svg, note_tp):
         """Get occlusion settings and pass them to the note generator (edit)"""
         dialog = self.imgoccedit
 
-        r1 = self.getUserInputs(dialog, edit=True)
+        r1 = self.getUserInputs(dialog, IO_MODELS_MAP[note_tp], self.mconfigs[note_tp], edit=True)
         if r1 is False:
             return False
         (fields, tags) = r1
@@ -340,7 +340,7 @@ class ImgOccAdd(object):
 
         noteGenerator = genByKey(choice, old_occl_tp)
         gen = noteGenerator(self.ed, svg, self.image_path,
-                            self.opref, tags, fields, did)
+                            self.opref, tags, fields, did, note_tp)
         r = gen.updateNotes()
         if r is False:
             return False

@@ -297,11 +297,11 @@ class ImgOccEdit(QDialog):
 
     def new(self, close=False):
         choice = self.occl_tp_select.currentText()
-        self.imgoccadd.onAddNotesButton(choice, close)
+        self.imgoccadd.onAddNotesButton(choice, close, self.note_tp)
 
     def editNote(self):
         choice = self.occl_tp_select.currentText()
-        self.imgoccadd.onEditNotesButton(choice)
+        self.imgoccadd.onEditNotesButton(choice, self.note_tp)
 
     def onHelp(self):
         if self.mode == "add":

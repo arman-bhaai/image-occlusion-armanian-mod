@@ -281,7 +281,7 @@ class ImgOccAdd(object):
                     """ % (bkgd_url, width, height))
         self.image_path = image_path
 
-    def onAddNotesButton(self, choice, close, note_tp=''):
+    def onAddNotesButton(self, choice, close, note_tp=None):
         dialog = self.imgoccedit
         dialog.svg_edit.evalWithCallback(
             "svgCanvas.svgCanvasToString();",

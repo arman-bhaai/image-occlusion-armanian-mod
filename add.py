@@ -53,7 +53,7 @@ svg_edit_queryitems = [('initStroke[opacity]', '1'),
 
 
 class ImgOccAdd(object):
-    def __init__(self, editor, origin, oldimg=None, model_map=None):
+    def __init__(self, editor, origin, model_map, note_tp, oldimg=None):
         self.ed = editor
         self.image_path = oldimg
         self.mode = "add"

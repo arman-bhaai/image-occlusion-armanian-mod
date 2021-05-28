@@ -59,13 +59,23 @@ def onIoHelp():
 def onImgOccButton(self, origin=None, image_path=None):
     """Launch Image Occlusion Enhanced"""
     origin = origin or getEdParentInstance(self.parentWindow)
-    io_model = getOrCreateModel(DFLT_MODEL)
+    note = self.note
+    model_name = note.model()['name']
+    if 'Image Occlusion ArMOD' in model_name:
+        note_tp = get_note_tp(model_name)
+        model_map = IO_MODELS_MAP[note_tp]
+    else:
+        note_tp = get_note_tp(DFLT_MODEL['name'])
+        model_map = DFLT_MODEL
+
+    io_model = getOrCreateModel(model_map)
+
     if io_model:
         io_model_fields = mw.col.models.fieldNames(io_model)
         if "imgocc_armod" in mw.col.conf:
-            dflt_fields = list(mw.col.conf['imgocc_armod']['io_models_map']['ao']['flds'].values())
+            dflt_fields = list(mw.col.conf['imgocc_armod']['io_models_map'][note_tp]['flds'].values())
         else:
-            dflt_fields = list(IO_MODELS_MAP['ao']['flds'].values())
+            dflt_fields = list(IO_MODELS_MAP[note_tp]['flds'].values())
         # note type integrity check
         if not all(x in io_model_fields for x in dflt_fields):
             ioCritical("model_error", help="notetype",
@@ -75,7 +85,7 @@ def onImgOccButton(self, origin=None, image_path=None):
         oldimg = self.imgoccadd.image_path
     except AttributeError:
         oldimg = None
-    self.imgoccadd = ImgOccAdd(self, origin, oldimg, DFLT_MODEL)
+    self.imgoccadd = ImgOccAdd(self, origin, model_map, note_tp, oldimg)
     self.imgoccadd.occlude(image_path)
 
 
@@ -242,6 +252,13 @@ def onShowAnswer(self, _old):
         self.web.eval("window.scrollTo({}, {});".format(
             scroll_pos.x(), scroll_pos.y()))
     return ret
+
+def get_note_tp(model_name):
+        for note_tp in IO_MODELS_MAP.values():
+            for k in note_tp.keys():
+                if note_tp[k] == model_name:
+                    m_short_name = note_tp['short_name']
+        return m_short_name
 
 
 # Set up menus

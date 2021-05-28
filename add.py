@@ -64,6 +64,8 @@ class ImgOccAdd(object):
     def occlude(self, image_path=None):
 
         note = self.ed.note
+        note_tp = self.get_note_tp(model_name)
+        logging.debug(f'notess: {note.model()}')
         isIO = (note and note.model() == getOrCreateModel(DFLT_MODEL))
 
         if not image_path:
@@ -388,5 +390,12 @@ class ImgOccAdd(object):
             fields[fn] = text
         tags = dialog.tags_edit.text().split()
         return (fields, tags)
+
+    def get_note_tp(self, model_name):
+        for note_tp in IO_MODELS_MAP.keys():
+            for k in note_tp.keys():
+                if note_tp[k] == model_name:
+                    m_short_name = note_tp['short_name']
+        return m_short_name
 
 logging.debug(f'Exiting: {__name__}')

@@ -405,7 +405,7 @@ class ImgOccEdit(QDialog):
         if currentTab == 0:
             self.tab_widget.setCurrentIndex(1)
             if isinstance(QApplication.focusWidget(), QPushButton):
-                self.tedit[self.ioflds["hd"]].setFocus()
+                self.tedit[self.mconfig['ioflds']["hd"]].setFocus()
         else:
             self.tab_widget.setCurrentIndex(0)
 
@@ -429,16 +429,16 @@ class ImgOccEdit(QDialog):
 
     def resetMainFields(self):
         """Reset all fields aside from sticky ones"""
-        for i in self.flds:
+        for i in self.mconfig['flds']:
             fn = i['name']
-            if fn in self.ioflds_priv or fn in self.ioflds_prsv:
+            if fn in self.mconfig['ioflds_priv'] or fn in self.mconfig['ioflds_prsv']:
                 continue
             self.tedit[fn].setPlainText("")
 
     def resetAllFields(self):
         """Reset all fields"""
         self.resetMainFields()
-        for i in self.ioflds_prsv:
+        for i in self.mconfig['ioflds_prsv']:
             self.tedit[i].setPlainText("")
 
     def fitImageCanvas(self):

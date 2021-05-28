@@ -203,7 +203,7 @@ def onProfileLoaded():
     # Setup add-on config and templates, update if necessary
     getSyncedConfig()
     getLocalConfig()
-    getOrCreateModel(DFLT_MODEL)
+    # getOrCreateModel(DFLT_MODEL)
 
 
 # Mask toggle hotkey

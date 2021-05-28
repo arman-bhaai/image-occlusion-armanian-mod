@@ -67,8 +67,12 @@ class ImgOccAdd(object):
 
         note = self.ed.note
         model_name = note.model()['name']
-        note_tp = self.get_note_tp(model_name)
         logging.debug(f'note: {note}')
+        if 'Image Occlusion ArMOD' in model_name:
+            note_tp = self.get_note_tp(model_name)
+        else:
+            note_tp = self.get_note_tp(DFLT_MODEL['name'])
+            
         isIO = (note and note.model() == getOrCreateModel(IO_MODELS_MAP[note_tp]))
 
         if not image_path:
@@ -199,7 +203,10 @@ class ImgOccAdd(object):
         deck = mw.col.decks.nameOrNone(opref["did"])
 
         model_name = onote.model()['name']
-        note_tp = self.get_note_tp(model_name)
+        if 'Image Occlusion ArMOD' in model_name:
+            note_tp = self.get_note_tp(model_name)
+        else:
+            note_tp = self.get_note_tp(DFLT_MODEL['name'])
 
         dialog = ImgOccEdit(self, self.ed.parentWindow, self.model_map, note_tp)
         dialog.setupFields(flds)

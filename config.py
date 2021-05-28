@@ -26,31 +26,6 @@ from aqt import mw
 global IO_HOME, IO_HOTKEY
 global IO_FLDS_OA, IO_FLDS_AO
 
-# IO_MODEL_NAME = "Image Occlusion Enhanced"
-# IO_CARD_NAME = "IO Card"
-
-# IO_FLDS = {
-#     'id': "ID (hidden)",
-#     'hd': "Header",
-#     'im': "Image",
-#     'ft': "Footer",
-#     'rk': "Remarks",
-#     'sc': "Sources",
-#     'e1': "Extra 1",
-#     'e2': "Extra 2",
-#     'qm': "Question Mask",
-#     'am': "Answer Mask",
-#     'om': "Original Mask"
-# }
-
-# IO_FLDS_IDS = ["id", "hd", "im", "qm", "ft", "rk",
-#                "sc", "e1", "e2", "am", "om"]
-
-# # TODO: Use IDs instead of names to make these compatible with self.ioflds
-
-# # fields that aren't user-editable
-# io_flds_PRIV = ['id', 'im', 'qm', 'am', 'om']
-
 IO_MODELS_MAP = {
     'ao': {
         'short_name': 'ao',
@@ -117,40 +92,6 @@ IO_MODELS_MAP = {
 DFLT_MODEL = IO_MODELS_MAP['ao']
 IO_FLDS_AO = IO_MODELS_MAP['ao']['flds']
 IO_FLDS_OA = IO_MODELS_MAP['oa']['flds']
-
-
-# IO_MODEL_NAMES = {
-#     'ao': 'Image Occlusion ArMOD AO',
-#     'oa': 'Image Occlusion ArMOD OA',
-#     'si': 'Image Occlusion ArMOD SI',
-#     'li': 'Image Occlusion ArMOD LI'
-# }
-# IO_CARD_NAME = "IO Card"
-
-# IO_FLDS = {
-#     'id': "ID (hidden)",
-#     'hd': "Header",
-#     'im': "Image",
-#     'ft': "Footer",
-#     'rk': "Remarks",
-#     'sc': "Sources",
-#     'e1': "Extra 1",
-#     'e2': "Extra 2",
-#     'qm': "Question Mask",
-#     'am': "Answer Mask",
-#     'om': "Original Mask"
-# }
-
-# IO_FLDS_IDS = ["id", "hd", "im", "qm", "ft", "rk",
-#                "sc", "e1", "e2", "am", "om"]
-
-# # TODO: Use IDs instead of names to make these compatible with self.ioflds
-
-# # fields that aren't user-editable
-# io_flds_PRIV = ['id', 'im', 'qm', 'am', 'om']
-
-# # fields that are synced between an IO Editor session and Anki's Editor
-# io_flds_PRSV = ['sc']
 
 
 from .template import *

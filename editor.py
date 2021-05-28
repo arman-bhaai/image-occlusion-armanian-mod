@@ -78,7 +78,7 @@ class ImgOccWebView(webview.AnkiWebView):
 class ImgOccEdit(QDialog):
     """Main Image Occlusion Editor dialog"""
 
-    def __init__(self, imgoccadd, parent, model_map):
+    def __init__(self, imgoccadd, parent, model_map, note_tp):
         QDialog.__init__(self)
         mw.setupDialogGC(self)
         self.setWindowFlags(Qt.Window)
@@ -86,6 +86,7 @@ class ImgOccEdit(QDialog):
         self.imgoccadd = imgoccadd
         self.parent = parent
         self.mode = "add"
+        self.note_tp = note_tp
         loadConfig(self)
         self.model_map = model_map
         self.mconfig = self.mconfigs[model_map['short_name']]
@@ -377,7 +378,7 @@ class ImgOccEdit(QDialog):
                 i.show()
             for i in hide_on_edit:
                 i.hide()
-            for i in self.sconf['skip']:
+            for i in self.sconf['io_models_map'][self.note_tp]['skip_flds']:
                 if i in list(self.tedit.keys()):
                     self.tedit[i].hide()
                     self.tlabel[i].hide()

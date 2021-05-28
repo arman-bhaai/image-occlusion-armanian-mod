@@ -16,6 +16,8 @@
 Add notes.
 """
 import logging
+
+from anki import models
 logging.debug(f'Running: {__name__}')
 
 import os
@@ -64,8 +66,7 @@ class ImgOccAdd(object):
     def occlude(self, image_path=None):
 
         note = self.ed.note
-        note_tp = self.get_note_tp(model_name)
-        logging.debug(f'notess: {note.model()}')
+        logging.debug(f'note: {note}')
         isIO = (note and note.model() == getOrCreateModel(DFLT_MODEL))
 
         if not image_path:
@@ -195,7 +196,10 @@ class ImgOccAdd(object):
         flds = self.mconfig['mflds']
         deck = mw.col.decks.nameOrNone(opref["did"])
 
-        dialog = ImgOccEdit(self, self.ed.parentWindow, self.model_map)
+        model_name = onote.model()['name']
+        note_tp = self.get_note_tp(model_name)
+
+        dialog = ImgOccEdit(self, self.ed.parentWindow, self.model_map, note_tp)
         dialog.setupFields(flds)
         dialog.switchToMode(self.mode)
         self.imgoccedit = dialog
@@ -392,7 +396,7 @@ class ImgOccAdd(object):
         return (fields, tags)
 
     def get_note_tp(self, model_name):
-        for note_tp in IO_MODELS_MAP.keys():
+        for note_tp in IO_MODELS_MAP.values():
             for k in note_tp.keys():
                 if note_tp[k] == model_name:
                     m_short_name = note_tp['short_name']

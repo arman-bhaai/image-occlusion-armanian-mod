@@ -59,6 +59,7 @@ class ImgOccAdd(object):
         self.mode = "add"
         self.origin = origin
         self.opref = {}  # original io session preference
+        self.note_tp = note_tp
         loadConfig(self)
         self.model_map = model_map
         self.mconfig = self.mconfigs[model_map['short_name']]
@@ -66,14 +67,9 @@ class ImgOccAdd(object):
     def occlude(self, image_path=None):
 
         note = self.ed.note
-        model_name = note.model()['name']
         logging.debug(f'note: {note}')
-        if 'Image Occlusion ArMOD' in model_name:
-            note_tp = self.get_note_tp(model_name)
-        else:
-            note_tp = self.get_note_tp(DFLT_MODEL['name'])
-            
-        isIO = (note and note.model() == getOrCreateModel(IO_MODELS_MAP[note_tp]))
+
+        isIO = (note and note.model() == getOrCreateModel(self.model_map))
 
         if not image_path:
             if self.origin == "addcards":
@@ -202,13 +198,7 @@ class ImgOccAdd(object):
         flds = self.mconfig['mflds']
         deck = mw.col.decks.nameOrNone(opref["did"])
 
-        model_name = onote.model()['name']
-        if 'Image Occlusion ArMOD' in model_name:
-            note_tp = self.get_note_tp(model_name)
-        else:
-            note_tp = self.get_note_tp(DFLT_MODEL['name'])
-
-        dialog = ImgOccEdit(self, self.ed.parentWindow, self.model_map, note_tp)
+        dialog = ImgOccEdit(self, self.ed.parentWindow, self.model_map, self.note_tp)
         dialog.setupFields(flds)
         dialog.switchToMode(self.mode)
         self.imgoccedit = dialog
@@ -403,12 +393,5 @@ class ImgOccAdd(object):
             fields[fn] = text
         tags = dialog.tags_edit.text().split()
         return (fields, tags)
-
-    def get_note_tp(self, model_name):
-        for note_tp in IO_MODELS_MAP.values():
-            for k in note_tp.keys():
-                if note_tp[k] == model_name:
-                    m_short_name = note_tp['short_name']
-        return m_short_name
 
 logging.debug(f'Exiting: {__name__}')

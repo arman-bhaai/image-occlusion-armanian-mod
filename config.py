@@ -49,7 +49,7 @@ global IO_FLDS_OA, IO_FLDS_AO
 # # TODO: Use IDs instead of names to make these compatible with self.ioflds
 
 # # fields that aren't user-editable
-# IO_FIDS_PRIV = ['id', 'im', 'qm', 'am', 'om']
+# io_flds_PRIV = ['id', 'im', 'qm', 'am', 'om']
 
 IO_MODELS_MAP = {
     'ao': {
@@ -77,8 +77,8 @@ IO_MODELS_MAP = {
             'css': ''
         },
         'skip_flds': ['e1', 'e2'],
-        'io_fids_priv': ['id', 'im', 'qm', 'am', 'om'], # fields that aren't user-editable
-        'io_fids_prsv': ['sc'], # fields that are synced between an IO Editor session and Anki's Editor
+        'io_flds_priv': ['id', 'im', 'qm', 'am', 'om'], # fields that aren't user-editable
+        'io_flds_prsv': ['sc'], # fields that are synced between an IO Editor session and Anki's Editor
         'sort_fld': 1 # set sortfield to header
     },
     'oa': {
@@ -106,8 +106,8 @@ IO_MODELS_MAP = {
             'css': ''
         },
         'skip_flds': ['e1', 'e2'],
-        'io_fids_priv': ['id', 'im', 'qm', 'am', 'om'], # fields that aren't user-editable
-        'io_fids_prsv': ['sc'], # fields that are synced between an IO Editor session and Anki's Editor
+        'io_flds_priv': ['id', 'im', 'qm', 'am', 'om'], # fields that aren't user-editable
+        'io_flds_prsv': ['sc'], # fields that are synced between an IO Editor session and Anki's Editor
         'sort_fld': 1 # set sortfield to header
     },
     
@@ -147,10 +147,10 @@ IO_FLDS_OA = IO_MODELS_MAP['oa']['flds']
 # # TODO: Use IDs instead of names to make these compatible with self.ioflds
 
 # # fields that aren't user-editable
-# IO_FIDS_PRIV = ['id', 'im', 'qm', 'am', 'om']
+# io_flds_PRIV = ['id', 'im', 'qm', 'am', 'om']
 
 # # fields that are synced between an IO Editor session and Anki's Editor
-# IO_FIDS_PRSV = ['sc']
+# io_flds_PRSV = ['sc']
 
 
 from .template import *
@@ -228,7 +228,7 @@ def getModelConfig(model_map):
     mflds = model['flds']
     ioflds = mw.col.conf['imgocc_armod']['io_models_map'][model_map['short_name']]['flds']
     ioflds_priv = []
-    for i in model_map['io_fids_priv']:
+    for i in model_map['io_flds_priv']:
         ioflds_priv.append(ioflds[i])
     # preserve fields if they are marked as sticky in the IO note type:
     ioflds_prsv = []

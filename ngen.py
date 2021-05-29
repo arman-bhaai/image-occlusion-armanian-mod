@@ -52,6 +52,10 @@ def genByKey(key, old_occl_tp=None):
         return IoGenAO
     elif key in ["oa", "Hide One, Guess One"]:
         return IoGenOA
+    elif key == 'si':
+        return IoGenSI
+    elif key == 'li':
+        return IoGenLI
     else:
         return IoGenAO
 
@@ -496,5 +500,29 @@ class IoGenOA(ImgOccNoteGenerator):
                 mask_node.setAttribute("class", "qshape")
             else:
                 mlayer_node.removeChild(mask_node)
+
+class IoGenSI(ImgOccNoteGenerator):
+    """
+    Q: Single question with occluded svg. A: Single answer with transparent occluded svg
+    Consumes less storage
+    """
+    occl_tp = "si"
+
+    def __init__(self, ed, svg, image_path, opref, tags, fields, did, note_tp):
+        self.note_tp = 'si'
+        ImgOccNoteGenerator.__init__(self, ed, svg, image_path,
+                                     opref, tags, fields, did, note_tp)
+
+class IoGenLI(ImgOccNoteGenerator):
+    """
+    Q: permanently occluded single question image . A: transparently occluded single answer image
+    Consumes high storage
+    """
+    occl_tp = "li"
+
+    def __init__(self, ed, svg, image_path, opref, tags, fields, did, note_tp):
+        self.note_tp = 'li'
+        ImgOccNoteGenerator.__init__(self, ed, svg, image_path,
+                                     opref, tags, fields, did, note_tp)
 
 logging.debug(f'Exiting: {__name__}')

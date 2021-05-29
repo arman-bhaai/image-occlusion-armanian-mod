@@ -165,6 +165,10 @@ class ImgOccEdit(QDialog):
                                            QDialogButtonBox.ActionRole)
         self.oa_btn = button_box.addButton("Hide &One, Guess One",
                                            QDialogButtonBox.ActionRole)
+        self.si_btn = button_box.addButton("Process &Short Image",
+                                           QDialogButtonBox.ActionRole)
+        self.li_btn = button_box.addButton("Process &Long Image",
+                                           QDialogButtonBox.ActionRole)
         close_button = button_box.addButton("&Close",
                                             QDialogButtonBox.RejectRole)
 
@@ -175,8 +179,12 @@ class ImgOccEdit(QDialog):
         new_tt = "Create new batch of cards without editing existing ones"
         ao_tt = ("Generate cards with nonoverlapping information, where all<br>"
                  "labels are hidden on the front and one revealed on the back")
-        oa_tt = ("Generate cards with overlapping information, where one<br>"
-                 "label is hidden on the front and revealed on the back")
+        oa_tt = ("Generate cards with overlapping information, where one <br>"
+                 "label is hidden on the front and revealed on the back.")
+        si_tt = ("Generate cards from processing short source image<br>"
+                 "Consumes less storage")
+        li_tt = ("Generate cards from processing long source image<br>"
+                 "Consumes high storage")
         close_tt = "Close Image Occlusion Editor without generating cards"
 
         image_btn.setToolTip(image_tt)
@@ -184,19 +192,23 @@ class ImgOccEdit(QDialog):
         self.new_btn.setToolTip(new_tt)
         self.ao_btn.setToolTip(ao_tt)
         self.oa_btn.setToolTip(oa_tt)
+        self.si_btn.setToolTip(si_tt)
+        self.li_btn.setToolTip(li_tt)
         close_button.setToolTip(close_tt)
         self.occl_tp_select.setItemData(0, dc_tt, Qt.ToolTipRole)
         self.occl_tp_select.setItemData(1, ao_tt, Qt.ToolTipRole)
         self.occl_tp_select.setItemData(2, oa_tt, Qt.ToolTipRole)
 
         for btn in [image_btn, self.edit_btn, self.new_btn, self.ao_btn,
-                    self.oa_btn, close_button]:
+                    self.oa_btn, self.si_btn, self.li_btn, close_button]:
             btn.setFocusPolicy(Qt.ClickFocus)
 
         self.edit_btn.clicked.connect(self.editNote)
         self.new_btn.clicked.connect(self.new)
         self.ao_btn.clicked.connect(self.addAO)
         self.oa_btn.clicked.connect(self.addOA)
+        self.si_btn.clicked.connect(self.add_si)
+        self.li_btn.clicked.connect(self.add_li)
         close_button.clicked.connect(self.close)
 
         # Set basic layout up
@@ -264,6 +276,10 @@ class ImgOccEdit(QDialog):
                   self).activated.connect(lambda: self.defaultAction(True))
         QShortcut(QKeySequence("Ctrl+Shift+Return"),
                   self).activated.connect(lambda: self.addOA(True))
+        QShortcut(QKeySequence("Ctrl+Alt+Return"),
+                  self).activated.connect(lambda: self.add_si(True))
+        QShortcut(QKeySequence("Ctrl+Alt+Shift+Return"),
+                  self).activated.connect(lambda: self.add_li(True))
         QShortcut(QKeySequence("Ctrl+Tab"),
                   self).activated.connect(self.switchTabs)
         QShortcut(QKeySequence("Ctrl+r"),
@@ -294,6 +310,12 @@ class ImgOccEdit(QDialog):
 
     def addOA(self, close=False):
         self.imgoccadd.onAddNotesButton("oa", close, 'oa')
+
+    def add_si(self, close=False):
+        self.imgoccadd.onAddNotesButton("si", close, 'si')
+
+    def add_li(self, close=False):
+        self.imgoccadd.onAddNotesButton("li", close, 'li')
 
     def new(self, close=False):
         choice = self.occl_tp_select.currentText()

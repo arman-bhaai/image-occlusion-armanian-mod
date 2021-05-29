@@ -732,7 +732,7 @@ class IoGenSI(ImgOccNoteGenerator):
             logging.debug("nr %s", nr)
             logging.debug("idx %s", idx)
             note_id = self.mnode_ids[idx]
-            q_nid = mw.col.findNotes(f'"{self.ioflds["id"]}:{note_id}"')
+            q_nid = mw.col.findNotes(f'"{self.mconfig["ioflds"]["id"]}:{note_id}"')
             logging.debug("note_id %s", note_id)
             logging.debug("self.nids %s", self.nids)
             nid = self.nids[note_id]
@@ -753,7 +753,7 @@ class IoGenSI(ImgOccNoteGenerator):
                 logging.debug("qset_idx %s", qset_idx)
                 logging.debug("q_idx %s", q_idx)
                 note_id = self.rnode_ids[qset_idx][q_idx]
-                q_nid = mw.col.findNotes(f'"{self.ioflds["id"]}:{note_id}"')
+                q_nid = mw.col.findNotes(f'"{self.mconfig["ioflds"]["id"]}:{note_id}"')
                 logging.debug("note_id %s", note_id)
                 logging.debug("self.nids %s", self.nids)
                 nid = self.nids[note_id]

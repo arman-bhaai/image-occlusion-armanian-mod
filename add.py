@@ -49,7 +49,8 @@ ext-snapping.js"
 svg_edit_fonts = "'Helvetica LT Std', Arial, sans-serif"
 svg_edit_queryitems = [('initStroke[opacity]', '1'),
                        ('showRulers', 'false'),
-                       ('extensions', svg_edit_ext)]
+                       ('extensions', svg_edit_ext),
+                       ('initOpacity', '0.3')]
 
 
 class ImgOccAdd(object):
@@ -121,7 +122,7 @@ class ImgOccAdd(object):
         image_path = img2path(note[self.mconfig['ioflds']['im']])
         omask = img2path(note[self.mconfig['ioflds']['om']])
 
-        if note_id is None or note_id.count("-") != 2:
+        if note_id is None or note_id.count("-") < 2:
             msg = "Editing unavailable: Invalid image occlusion Note ID"
             return msg, None
         elif not omask or not image_path:

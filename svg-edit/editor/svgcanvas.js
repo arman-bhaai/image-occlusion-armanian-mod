@@ -6456,6 +6456,7 @@ this.clear = function() {
 
 	// create default layers
 	canvas.createLayer("Labels");
+	canvas.createLayer("ReverseQ"); ///@ add oneln
 	canvas.createLayer("Masks");
 	
 	// clear the undo stack

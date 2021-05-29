@@ -165,7 +165,7 @@ default_conf_local = {'version': 0.02,
                       'dir': IO_HOME,
                       'hotkey': IO_HOTKEY}
 default_conf_syncd = {'version': 0.02,
-                      'ofill': 'FFEBA2',
+                      'ofill': '7f007f', # 'FFEBA2',
                       'qfill': 'FF7E7E',
                       'scol': '2D2D2D',
                       'swidth': 3,

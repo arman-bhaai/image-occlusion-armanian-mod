@@ -89,7 +89,7 @@ IO_MODELS_MAP = {
         'short_name': 'si',
         'name': 'Image Occlusion ArMOD SI',
         'fld_ids': ['id', 'extq', 'exta', # TODO: Use IDs instead of names to make these compatible with self.ioflds
-                     'extmnem', 'im', 'qm', 'om', 'am', 'hd', 'ft', 'rk', 'sc'],
+                     'extmnem', 'im', 'qm', 'om', 'am', 'hd'],
         'flds': {
             'id': "ID (hidden)",
             'ext_q': 'Question Extra',
@@ -99,10 +99,7 @@ IO_MODELS_MAP = {
             'qm': "Question Mask",
             'om': "Original Mask",
             'am': "Answer Mask",
-            'hd': "Header",
-            'ft': "Footer",
-            'rk': "Remarks",
-            'sc': "Sources"
+            'hd': "Header"
         },
         'card1': {
             'name': 'IO ArMOD Card SI',
@@ -150,7 +147,8 @@ IO_MODELS_MAP = {
 DFLT_MODEL = IO_MODELS_MAP['ao']
 IO_FLDS_AO = IO_MODELS_MAP['ao']['flds']
 IO_FLDS_OA = IO_MODELS_MAP['oa']['flds']
-
+IO_FLDS_SI = IO_MODELS_MAP['si']['flds']
+IO_FLDS_LI = IO_MODELS_MAP['li']['flds']
 
 from .template import *
 

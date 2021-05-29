@@ -388,6 +388,7 @@ class ImgOccAdd(object):
         skip_flds = self.sconf['io_models_map'][model_map['short_name']]['flds']
         skip_flds_name = [v for (k,v) in skip_flds.items() if k in skip_flds_id]
         logging.debug(f'skip_flds_name: {skip_flds_name}')
+        logging.debug(f'dialog.tedit: {dialog.tedit}')
         for i in model_config['mflds']:
             fn = i['name']
             if fn in model_config['ioflds_priv']:

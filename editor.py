@@ -381,7 +381,11 @@ class ImgOccEdit(QDialog):
     def switchToMode(self, mode):
         """Toggle between add and edit layouts"""
         hide_on_add = [self.occl_tp_select, self.edit_btn, self.new_btn]
-        hide_on_edit = [self.ao_btn, self.oa_btn]
+        hide_on_edit = [self.ao_btn, self.oa_btn, self.si_btn, self.li_btn]
+        hide_forever = []
+        if ONLY_MOD_BUTTONS:
+            hide_forever = [self.occl_tp_select, self.new_btn, self.ao_btn, self.oa_btn]
+
         self.mode = mode
         for i in list(self.tedit.values()):
             i.show()
@@ -392,6 +396,8 @@ class ImgOccEdit(QDialog):
                 i.hide()
             for i in hide_on_edit:
                 i.show()
+            for i in hide_forever:
+                i.hide()
             dl_txt = "Deck"
             ttl = "Image Occlusion ArMOD - Add Mode"
             bl_txt = "Add Cards:"
@@ -399,6 +405,8 @@ class ImgOccEdit(QDialog):
             for i in hide_on_add:
                 i.show()
             for i in hide_on_edit:
+                i.hide()
+            for i in hide_forever:
                 i.hide()
             logging.debug(f'self.note_tp: {self.note_tp}')
             logging.debug(f'self.sconf: {self.sconf}')

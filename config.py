@@ -26,6 +26,8 @@ from aqt import mw
 global IO_HOME, IO_HOTKEY
 global IO_FLDS_OA, IO_FLDS_AO
 
+ONLY_MOD_BUTTONS = True
+
 IO_MODELS_MAP = {
     'ao': {
         'short_name': 'ao',
@@ -88,8 +90,8 @@ IO_MODELS_MAP = {
     'si': {
         'short_name': 'si',
         'name': 'Image Occlusion ArMOD SI',
-        'fld_ids': ['id', 'extq', 'exta', # TODO: Use IDs instead of names to make these compatible with self.ioflds
-                     'extmnem', 'im', 'qm', 'om', 'am', 'hd'],
+        'fld_ids': ['id', 'ext_q', 'ext_a', # TODO: Use IDs instead of names to make these compatible with self.ioflds
+                     'ext_mnem', 'im', 'qm', 'om', 'am', 'hd'],
         'flds': {
             'id': "ID (hidden)",
             'ext_q': 'Question Extra',

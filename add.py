@@ -334,6 +334,7 @@ class ImgOccAdd(object):
         if r1 is False:
             return False
         (fields, tags) = r1
+        logging.debug(f'fields: {fields}')
         did = self.opref["did"]
         old_occl_tp = self.opref["occl_tp"]
 

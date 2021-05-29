@@ -435,8 +435,11 @@ class ImgOccNoteGenerator(object):
         else:
             note = Note(mw.col, model)
 
+        logging.debug(f'mflds1: {mflds}')
+        logging.debug(f'fields1: {fields}')
         # add fields to note
         note.tags = self.tags
+        logging.debug(f'note1: {note}')
         for i in mflds:
             fname = i["name"]
             if fname in fields:

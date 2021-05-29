@@ -31,7 +31,7 @@ IO_MODELS_MAP = {
         'short_name': 'ao',
         'name': 'Image Occlusion ArMOD AO',
         'fld_ids': ["id", "hd", "im", # TODO: Use IDs instead of names to make these compatible with self.ioflds
-        "qm", "ft", "rk", "sc", "e1", "e2", "am", "om"], 
+                    "qm", "ft", "rk", "sc", "e1", "e2", "am", "om"], 
         'flds': {
             'id': "ID (hidden)",
             'hd': "Header",
@@ -60,7 +60,7 @@ IO_MODELS_MAP = {
         'short_name': 'oa',
         'name': 'Image Occlusion ArMOD OA',
         'fld_ids': ["id", "hd", "im", # TODO: Use IDs instead of names to make these compatible with self.ioflds
-        "qm", "ft", "rk", "sc", "e1", "e2", "am", "om"], 
+                    "qm", "ft", "rk", "sc", "e1", "e2", "am", "om"], 
         'flds': {
             'id': "ID (hidden)",
             'hd': "Header",
@@ -82,6 +82,64 @@ IO_MODELS_MAP = {
         },
         'skip_flds': ['e1', 'e2'],
         'io_flds_priv': ['id', 'im', 'qm', 'am', 'om'], # fields that aren't user-editable
+        'io_flds_prsv': ['sc'], # fields that are synced between an IO Editor session and Anki's Editor
+        'sort_fld': 1 # set sortfield to header
+    },
+    'si': {
+        'short_name': 'si',
+        'name': 'Image Occlusion ArMOD SI',
+        'fld_ids': ['id', 'extq', 'exta', # TODO: Use IDs instead of names to make these compatible with self.ioflds
+                     'extmnem', 'im', 'qm', 'om', 'am', 'hd', 'ft', 'rk', 'sc'],
+        'flds': {
+            'id': "ID (hidden)",
+            'ext_q': 'Question Extra',
+            'ext_a': 'Answer Extra',
+            'ext_mnem': 'Mnemonics',
+            'im': "Image",
+            'qm': "Question Mask",
+            'om': "Original Mask",
+            'am': "Answer Mask",
+            'hd': "Header",
+            'ft': "Footer",
+            'rk': "Remarks",
+            'sc': "Sources"
+        },
+        'card1': {
+            'name': 'IO ArMOD Card SI',
+            'front': '',
+            'back': '',
+            'css': ''
+        },
+        'skip_flds': ['ext_q', 'ext_a', 'ext_mnem'],
+        'io_flds_priv': ['id', 'im', 'qm', 'am', 'om'], # fields that aren't user-editable
+        'io_flds_prsv': ['sc'], # fields that are synced between an IO Editor session and Anki's Editor
+        'sort_fld': 1 # set sortfield to header
+    },
+    'li': {
+        'short_name': 'li',
+        'name': 'Image Occlusion ArMOD LI',
+        'fld_ids': ['id', 'q_img', 'a_img', 'ext_q', # TODO: Use IDs instead of names to make these compatible with self.ioflds
+                    'ext_a', 'ext_mnem', 'im', 'qm', 'om', 'hd'],
+        'flds': {
+            'id': "ID (hidden)",
+            'q_img': 'Question Image',
+            'a_img': 'Answer Image',
+            'ext_q': 'Question Extra',
+            'ext_a': 'Answer Extra',
+            'ext_mnem': 'Mnemonics',
+            'im': "Image",
+            'qm': "Question Mask",
+            'om': "Original Mask",
+            'hd': "Header"
+        },
+        'card1': {
+            'name': 'IO ArMOD Card LI',
+            'front': '',
+            'back': '',
+            'css': ''
+        },
+        'skip_flds': ['ext_q', 'ext_a', 'ext_mnem'],
+        'io_flds_priv': ['id', 'im', 'qm', 'om'], # fields that aren't user-editable
         'io_flds_prsv': ['sc'], # fields that are synced between an IO Editor session and Anki's Editor
         'sort_fld': 1 # set sortfield to header
     },

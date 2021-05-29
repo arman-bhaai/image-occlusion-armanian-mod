@@ -384,7 +384,8 @@ class ImgOccEdit(QDialog):
             logging.debug(f'self.tlabel: {self.tlabel}')
             logging.debug(f'skip_flds: {self.sconf["io_models_map"][self.note_tp]["skip_flds"]}')
             flds = self.sconf['io_models_map'][self.note_tp]['flds']
-            for i in self.sconf['io_models_map'][self.note_tp]['skip_flds']:
+            skip_flds_id = self.sconf['io_models_map'][self.note_tp]['skip_flds']
+            for i in skip_flds_id:
                 if flds[i] in list(self.tedit.keys()):
                     self.tedit[flds[i]].hide()
                     self.tlabel[flds[i]].hide()

@@ -382,12 +382,16 @@ class ImgOccAdd(object):
         if not all(x in io_model_fields for x in list(model_config['ioflds'].values())):
             ioCritical("model_error", help="notetype", parent=dialog)
             return False
+        logging.debug(f'model_config: {model_config}')
+        skip_flds_id = self.sconf['io_models_map'][model_map['short_name']]['skip_flds']
+        skip_flds = self.sconf['io_models_map'][model_map['short_name']]['flds']
+        skip_flds_name = [v for (k,v) in skip_flds.items() if k in skip_flds_id]
+        logging.debug(f'skip_flds_name: {skip_flds_name}')
         for i in model_config['mflds']:
             fn = i['name']
             if fn in model_config['ioflds_priv']:
                 continue
-            skip_flds = self.sconf['io_models_map'][model_map['short_name']]['skip_flds']
-            if edit and fn in skip_flds:
+            if edit and fn in skip_flds_name:
                 continue
             text = dialog.tedit[fn].toPlainText().replace('\n', '<br />')
             fields[fn] = text

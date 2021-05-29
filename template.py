@@ -837,12 +837,28 @@ def add_io_model(col, model_map):
         models.addField(io_model, fld)
     # Add template
     template = models.newTemplate(model_map['card1']['name'])
-    if model_map['short_name']:
-    template['qfmt'] = iocard_front_ao
-    template['afmt'] = iocard_back_ao
+    if model_map['short_name'] == 'ao':
+      template['qfmt'] = iocard_front_ao
+      template['afmt'] = iocard_back_ao
+      io_model['css'] = iocard_css_ao
+      io_model['sortf'] = 1
+    elif model_map['short_name'] == 'oa':
+      template['qfmt'] = iocard_front_oa
+      template['afmt'] = iocard_back_oa
+      io_model['css'] = iocard_css_oa
+      io_model['sortf'] = 1
+    elif model_map['short_name'] == 'si':
+      template['qfmt'] = iocard_front_si
+      template['afmt'] = iocard_back_si
+      io_model['css'] = iocard_css_si
+      io_model['sortf'] = 1
+    elif model_map['short_name'] == 'li':
+      template['qfmt'] = iocard_front_li
+      template['afmt'] = iocard_back_li
+      io_model['css'] = iocard_css_li
+      io_model['sortf'] = 1
+      
     logging.debug(f'template: {template}')
-    io_model['css'] = iocard_css_ao
-    io_model['sortf'] = 1
     models.addTemplate(io_model, template)
     models.add(io_model)
     return io_model

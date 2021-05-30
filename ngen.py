@@ -75,6 +75,7 @@ class ImgOccNoteGenerator(object):
         self.fields = fields
         self.did = did
         self.qfill = '#' + mw.col.conf['imgocc_armod']['qfill']
+        self.rev_afill = '#' + mw.col.conf['imgocc_armod']['rev_afill'] # qfill for li reversed answers
         self.hider_fill = '#' + mw.col.conf['imgocc_armod']['hider_fill']
         self.note_tp = note_tp
         loadConfig(self)
@@ -1255,9 +1256,7 @@ class IoGenLI(IoGenSI):
                 q_wrapper = mlayer_node[q_elm_idx + 1]
                 # get question wrapper img
                 cropped_qw_img = self.get_qwrapper_img(q_wrapper, src_img)
-    
-                # cropped_q.save('/tmp/11.png')
-                # input('img saved')
+
                 q_elm = mlayer_node[q_elm_idx]
                 q_elm.set('class', 'qshape')
 
@@ -1455,13 +1454,13 @@ class IoGenLI(IoGenSI):
                     if q_elm.get('fill'): # elms except g
                         q_elm.set('fill', self.qfill)
                         # process answer image mask
-                        self.create_mask_img(q_elm, self.qfill, 50, cropped_qw_img, q_wrapper)
+                        self.create_mask_img(q_elm, self.rev_afill, 50, cropped_qw_img, q_wrapper)
                     else: # elms only g
                         for q_shape in q_elm.findall('*'):
                             q_shape.set('class', 'qshape')
                             q_shape.set('fill', self.qfill)
                             # process multiple masked answer image mask
-                            self.create_mask_img(q_shape, self.qfill, 50, cropped_qw_img, q_wrapper)
+                            self.create_mask_img(q_shape, self.rev_afill, 50, cropped_qw_img, q_wrapper)
 
                     # preserved elms -> root, layers, titles, current q elms
                     preserved_shapes_all = [svg_node, svg_node[0], svg_node[0][0], svg_node[1], 
@@ -1495,6 +1494,7 @@ class IoGenLI(IoGenSI):
                     svg_node.append(inversed_wrapper)
                     xml = self.remove_namespace(ET.tostring(svg_node).decode('utf-8'))
                     masks.append(xml)  
+                    images_obj.append(cropped_qw_img)
         return masks, images_obj
 
     def updateNotes(self):
@@ -1608,15 +1608,15 @@ class IoGenLI(IoGenSI):
         self.new_svg = self.remove_namespace(ET.tostring(svg_node).decode('utf-8')) # write changes to svg ###@ edt oneitm
         omask_path = self._saveMask(self.new_svg, self.occl_id, "O")
         (reg_qmasks, reg_images_obj_q) = self._generateMaskSVGsForRegular("Q")
-        (reg_amasks, reg_images_obj_a) = self._generateMaskSVGsForRegular("A")
+        (reg_amasks, reg_images_obj_a) = self._generateMaskSVGsForRegular("A") # reg_amasks are obsolete
         (rev_qmasks, rev_images_obj_q) = self._generateMaskSVGsForReverse("Q")
-        (rev_amasks, rev_images_obj_a) = self._generateMaskSVGsForReverse("A")
+        (rev_amasks, rev_images_obj_a) = self._generateMaskSVGsForReverse("A") # rev_amasks are obsolete
         logging.debug(f'reg_qmasks {reg_qmasks}')
-        logging.debug(f'reg_amasks {reg_amasks}')
-        logging.debug(f'rev_qmasks {rev_qmasks}')
-        logging.debug(f'rev_amasks {rev_amasks}')
+        logging.debug(f'reg_amasks {reg_amasks}') # reg_amasks are obsolete
         logging.debug(f'reg_images_obj_q {reg_images_obj_q}')
         logging.debug(f'reg_amasks_obj_a {reg_images_obj_a}')
+        logging.debug(f'rev_qmasks {rev_qmasks}')
+        logging.debug(f'rev_amasks {rev_amasks}') # rev_amasks are obsolete
         logging.debug(f'rev_images_obj_q {rev_images_obj_q}')
         logging.debug(f'rev_amasks_obj_a {rev_images_obj_a}')
         image_path = mw.col.media.addFile(self.image_path)

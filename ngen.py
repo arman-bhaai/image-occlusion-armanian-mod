@@ -1214,23 +1214,24 @@ class IoGenLI(IoGenSI):
             mw.col.addNote(note)
             logging.debug("!notecreate %s", note)
 
-    def create_qmask_img(self, q_elm, fill, q_wrapper):
+    def create_qmask_img(self, q_elm_svg, fill, q_wrapper_img, q_wrapper_svg):
         """process question image mask"""
-        (qe_width, qe_height) = (float(q_elm.get('width')), float(q_elm.get('height')))
-        (qe_x, qe_y) = (float(q_elm.get('x')), float(q_elm.get('y'))) # qe means q_elm
+        (qe_width, qe_height) = (float(q_elm_svg.get('width')), float(q_elm_svg.get('height')))
+        (qe_x, qe_y) = (float(q_elm_svg.get('x')), float(q_elm_svg.get('y'))) # qe means q_elm
         # this is gonna be an invisible wrapper for q_mask 
-        qmask_wrapper = Image.new('RGB', (int(qe_width)+2, int(qe_height)+2), '#0000FF')
+        qmask_wrapper = Image.new('RGB', (int(qe_width)+1, int(qe_height)+1), '#0000FF')
         # Image.new() doesn't support float arguments, that's why we are using ImageDraw class and do some workarounds
         qmask_wrapper.putalpha(100) # make qmask_wrapper invisible
         qmask_draw = ImageDraw.Draw(qmask_wrapper)
-        # qmask_area = (qe_x, qe_y, qe_x+qe_width, qe_y+qe_height)
-        qmask_area = (10,10,qe_width,qe_height)
-        # this is real qmask
-        qmask_draw.rectangle(qmask_area, fill)
+        # qmask_area = (10,10,qe_width,qe_height)
+        # # this is real qmask
+        # qmask_draw.rectangle(qmask_area, fill)
 
         # FIXME do workarounds for float instead of pasting in int coordinate
-        q_wrapper.paste(qmask_wrapper, (0,0), mask=qmask_wrapper)
-        q_wrapper.show()
+        (qw_x, qw_y) = (float(q_wrapper_svg.get('x')), float(q_wrapper_svg.get('y')))
+        (left, top) = (qe_x-qw_x, qe_y-qw_y)
+        q_wrapper_img.paste(qmask_wrapper, (int(left), int(top)), mask=qmask_wrapper)
+        q_wrapper_img.show()
         # qmask_wrapper.show()
         # print(q_wrapper)
         print(qe_x, qe_y, qe_width, qe_height)
@@ -1303,7 +1304,7 @@ class IoGenLI(IoGenSI):
                 if q_elm.get('fill'): # elms except g
                     q_elm.set('fill', self.qfill)
                     # process image mask
-                    self.create_qmask_img(q_elm, self.qfill, cropped_qw) # qmask has no transparency
+                    self.create_qmask_img(q_elm, self.qfill, cropped_qw, q_wrapper) # qmask has no transparency
                 else: # elms only g
                     for q_shape in q_elm.findall('*'):
                         if q_shape.get('fill') != 'none': # these are q shapes 

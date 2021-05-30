@@ -213,7 +213,10 @@ def onProfileLoaded():
     # Setup add-on config and templates, update if necessary
     getSyncedConfig()
     getLocalConfig()
-    # getOrCreateModel(DFLT_MODEL)
+    getOrCreateModel(DFLT_MODEL)
+    getOrCreateModel(IO_MODELS_MAP['oa'])
+    getOrCreateModel(IO_MODELS_MAP['si'])
+    getOrCreateModel(IO_MODELS_MAP['li'])
 
 
 # Mask toggle hotkey

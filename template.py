@@ -20,7 +20,7 @@ import logging
 logging.debug(f'Running: {__name__}')
 
 from .config import *
-from .config import IO_FLDS_OA, IO_FLDS_AO, DFLT_MODEL
+from .config import IO_FLDS_OA, IO_FLDS_AO, IO_FLDS_SI, IO_FLDS_LI, DFLT_MODEL
 
 # DEFAULT CARD TEMPLATES
 iocard_front_ao = """\
@@ -419,17 +419,320 @@ iocard_css_oa = """\
 }
 """
 
-# IO_MODELS_MAP['ao']['card1'].update({
-#   'front': iocard_front_ao,
-#   'back': iocard_back_ao,
-#   'css': iocard_css_ao
-# },)
+iocard_front_si = """\
 
-# IO_MODELS_MAP['oa']['card1'].update({
-#   'front': iocard_front_oa,
-#   'back': iocard_back_oa,
-#   'css': iocard_css_oa
-# },)
+
+{{#%(src_img)s}}
+<div id="io-header">{{%(header)s}}</div>
+<div id="io-qextra">{{%(ext_q)s}}</div>
+<div id="io-wrapper">
+  <div id="io-overlay">{{%(que)s}}</div>
+  <div id="io-original">{{%(src_img)s}}</div>
+</div>
+
+<script>
+// Prevent original image from loading before mask
+aFade = 50, qFade = 0;
+var mask = document.querySelector('#io-overlay>img');
+function loaded() {
+    var original = document.querySelector('#io-original');
+    original.style.visibility = "visible";
+}
+if (mask === null || mask.complete) {
+    loaded();
+} else {
+    mask.addEventListener('load', loaded);
+}
+</script>
+{{/%(src_img)s}}
+""" % \
+    {'que': IO_FLDS_SI['qm'],
+     'ans': IO_FLDS_SI['am'],
+     'svg': IO_FLDS_SI['om'],
+     'src_img': IO_FLDS_SI['im'],
+     'header': IO_FLDS_SI['hd'],
+     'ext_q': IO_FLDS_SI['ext_q'],
+     'ext_a': IO_FLDS_SI['ext_a'],
+     'ext_mnem': IO_FLDS_SI['ext_mnem']}
+
+
+iocard_back_si = """\
+{{#%(src_img)s}}
+<div id="io-header">{{%(header)s}}</div>
+{{#%(ext_q)s}}
+<div id="io-qextra">{{%(ext_q)s}}</div>
+{{/%(ext_q)s}}
+<div id="io-wrapper">
+  <div id="io-overlay">{{%(ans)s}}</div>
+  <div id="io-original">{{%(src_img)s}}</div>
+</div>
+<button id="io-revl-btn" onclick="toggle();">Toggle Masks</button>
+<div id="io-extra-wrapper">
+  <div id="io-extra">
+    {{#%(ext_a)s}}
+    <div id="io-aextra">
+      <div class="io-field-descr">%(ext_a)s</div>{{%(ext_a)s}}
+    </div>
+    {{/%(ext_a)s}}
+    {{#%(ext_mnem)s}}
+    <div id="io-mnemonics">
+      <div class="io-field-descr">%(ext_mnem)s</div>{{%(ext_mnem)s}}
+    </div>
+    {{/%(ext_mnem)s}}
+  </div>
+</div>
+
+<script>
+// Toggle answer mask on clicking the image
+var toggle = function() {
+  var amask = document.getElementById('io-overlay');
+  if (amask.style.display === 'block' || amask.style.display === '')
+    amask.style.display = 'none';
+  else
+    amask.style.display = 'block'
+}
+
+// Prevent original image from loading before mask
+aFade = 50, qFade = 0;
+var mask = document.querySelector('#io-overlay>img');
+function loaded() {
+    var original = document.querySelector('#io-original');
+    original.style.visibility = "visible";
+}
+if (mask === null || mask.complete) {
+    loaded();
+} else {
+    mask.addEventListener('load', loaded);
+}
+</script>
+{{/%(src_img)s}}
+""" % \
+    {'que': IO_FLDS_SI['qm'],
+     'ans': IO_FLDS_SI['am'],
+     'svg': IO_FLDS_SI['om'],
+     'src_img': IO_FLDS_SI['im'],
+     'header': IO_FLDS_SI['hd'],
+     'ext_q': IO_FLDS_SI['ext_q'],
+     'ext_a': IO_FLDS_SI['ext_a'],
+     'ext_mnem': IO_FLDS_SI['ext_mnem']}
+
+iocard_css_si = """\
+/* GENERAL CARD STYLE */
+.card {
+  font-family: "Helvetica LT Std", Helvetica, Arial, Sans;
+  font-size: 150%;
+  text-align: center;
+  color: black;
+  background-color: white;
+}
+
+/* OCCLUSION CSS START - don't edit this */
+#io-overlay {
+  position:absolute;
+  top:0;
+  width:100%;
+  z-index:3
+}
+
+#io-original {
+  position:relative;
+  top:0;
+  width:100%;
+  z-index:2;
+  visibility: hidden;
+}
+
+#io-wrapper {
+  position:relative;
+  width: 100%;
+}
+/* OCCLUSION CSS END */
+
+/* OTHER STYLES */
+#io-header{
+  font-size: 1.1em;
+  margin-bottom: 0.2em;
+}
+
+#io-qextra, #io-aextra, #io-mnemonics{
+  /* the wrapper is needed to center the
+  left-aligned blocks below it */
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0.5em;
+}
+
+#io-extra{
+  text-align:center;
+  display: inline-block;
+}
+
+.io-extra-entry{
+  margin-top: 0.8em;
+  font-size: 0.9em;
+  text-align:left;
+}
+
+.io-field-descr{
+  margin-bottom: 0.2em;
+  font-weight: bold;
+  font-size: 1em;
+}
+
+#io-revl-btn {
+  font-size: 0.5em;
+}
+
+/* ADJUSTMENTS FOR MOBILE DEVICES */
+
+.mobile .card, .mobile #content {
+  font-size: 120%;
+  margin: 0;
+}
+
+.mobile #io-qextra, .mobile #io-aextra, .mobile #io-mnemonics, {
+  width: 95%;
+}
+
+.mobile #io-revl-btn {
+  font-size: 0.8em;
+}
+"""
+
+
+iocard_front_li = """\
+
+
+{{#%(src_img)s}}
+<div id="io-header">{{%(header)s}}</div>
+<div id="io-qextra">{{%(ext_q)s}}</div>
+<div id="io-wrapper">
+  <div id="io-overlay">{{%(q_img)s}}</div>
+</div>
+{{/%(src_img)s}}
+""" % \
+    {'que': IO_FLDS_LI['qm'],
+     'svg': IO_FLDS_LI['om'],
+     'src_img': IO_FLDS_LI['im'],
+     'header': IO_FLDS_LI['hd'],
+     'ext_q': IO_FLDS_LI['ext_q'],
+     'ext_a': IO_FLDS_LI['ext_a'],
+     'ext_mnem': IO_FLDS_LI['ext_mnem'],
+     'q_img': IO_FLDS_LI['q_img'],
+     'a_img': IO_FLDS_LI['a_img']}
+
+
+iocard_back_li = """\
+{{#%(src_img)s}}
+<div id="io-header">{{%(header)s}}</div>
+{{#%(ext_q)s}}
+<div id="io-qextra">{{%(ext_q)s}}</div>
+{{/%(ext_q)s}}
+<div id="io-wrapper">
+  <div id="io-overlay">{{%(a_img)s}}</div>
+</div>
+<div id="io-extra-wrapper">
+  <div id="io-extra">
+    {{#%(ext_a)s}}
+    <div id="io-aextra">
+      <div class="io-field-descr">%(ext_a)s</div>{{%(ext_a)s}}
+    </div>
+    {{/%(ext_a)s}}
+    {{#%(ext_mnem)s}}
+    <div id="io-mnemonics">
+      <div class="io-field-descr">%(ext_mnem)s</div>{{%(ext_mnem)s}}
+    </div>
+    {{/%(ext_mnem)s}}
+  </div>
+</div>
+{{/%(src_img)s}}
+""" % \
+    {'que': IO_FLDS_LI['qm'],
+     'svg': IO_FLDS_LI['om'],
+     'src_img': IO_FLDS_LI['im'],
+     'header': IO_FLDS_LI['hd'],
+     'ext_q': IO_FLDS_LI['ext_q'],
+     'ext_a': IO_FLDS_LI['ext_a'],
+     'ext_mnem': IO_FLDS_LI['ext_mnem'],
+     'q_img': IO_FLDS_LI['q_img'],
+     'a_img': IO_FLDS_LI['a_img']}
+
+iocard_css_li = """\
+/* GENERAL CARD STYLE */
+.card {
+  font-family: "Helvetica LT Std", Helvetica, Arial, Sans;
+  font-size: 150%;
+  text-align: center;
+  color: black;
+  background-color: white;
+}
+
+/* OCCLUSION CSS START - don't edit this */
+#io-overlay {
+  position:absolute;
+  top:0;
+  width:100%;
+  z-index:3
+}
+
+#io-wrapper {
+  position:relative;
+  width: 100%;
+}
+/* OCCLUSION CSS END */
+
+/* OTHER STYLES */
+#io-header{
+  font-size: 1.1em;
+  margin-bottom: 0.2em;
+}
+
+#io-qextra, #io-aextra, #io-mnemonics{
+  /* the wrapper is needed to center the
+  left-aligned blocks below it */
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0.5em;
+}
+
+#io-extra{
+  text-align:center;
+  display: inline-block;
+}
+
+.io-extra-entry{
+  margin-top: 0.8em;
+  font-size: 0.9em;
+  text-align:left;
+}
+
+.io-field-descr{
+  margin-bottom: 0.2em;
+  font-weight: bold;
+  font-size: 1em;
+}
+
+#io-revl-btn {
+  font-size: 0.5em;
+}
+
+/* ADJUSTMENTS FOR MOBILE DEVICES */
+
+.mobile .card, .mobile #content {
+  font-size: 120%;
+  margin: 0;
+}
+
+.mobile #io-qextra, .mobile #io-aextra, .mobile #io-mnemonics, {
+  width: 95%;
+}
+
+.mobile #io-revl-btn {
+  font-size: 0.8em;
+}
+"""
 
 
 # INCREMENTAL UPDATES
@@ -484,11 +787,28 @@ def add_io_model(col, model_map):
         models.addField(io_model, fld)
     # Add template
     template = models.newTemplate(model_map['card1']['name'])
-    template['qfmt'] = iocard_front_ao # model_map['card1']['front']
-    template['afmt'] = iocard_back_ao # model_map['card1']['back']
+    if model_map['short_name'] == 'ao':
+      template['qfmt'] = iocard_front_ao
+      template['afmt'] = iocard_back_ao
+      io_model['css'] = iocard_css_ao
+      io_model['sortf'] = 1
+    elif model_map['short_name'] == 'oa':
+      template['qfmt'] = iocard_front_oa
+      template['afmt'] = iocard_back_oa
+      io_model['css'] = iocard_css_oa
+      io_model['sortf'] = 1
+    elif model_map['short_name'] == 'si':
+      template['qfmt'] = iocard_front_si
+      template['afmt'] = iocard_back_si
+      io_model['css'] = iocard_css_si
+      io_model['sortf'] = 1
+    elif model_map['short_name'] == 'li':
+      template['qfmt'] = iocard_front_li
+      template['afmt'] = iocard_back_li
+      io_model['css'] = iocard_css_li
+      io_model['sortf'] = 1
+      
     logging.debug(f'template: {template}')
-    io_model['css'] = iocard_css_ao # model_map['card1']['css']
-    io_model['sortf'] = 1 # model_map['sort_fld']
     models.addTemplate(io_model, template)
     models.add(io_model)
     return io_model

@@ -30,6 +30,7 @@ from aqt.utils import tooltip, showWarning
 
 from .ngen import *
 from .config import *
+from .config import ed_fill_opacity
 
 from .editor import ImgOccEdit
 from .dialogs import ioCritical, ioInfo
@@ -49,7 +50,8 @@ ext-snapping.js"
 svg_edit_fonts = "'Helvetica LT Std', Arial, sans-serif"
 svg_edit_queryitems = [('initStroke[opacity]', '1'),
                        ('showRulers', 'false'),
-                       ('extensions', svg_edit_ext)]
+                       ('extensions', svg_edit_ext),
+                       ('initOpacity', str(ed_fill_opacity))]
 
 
 class ImgOccAdd(object):
@@ -121,7 +123,7 @@ class ImgOccAdd(object):
         image_path = img2path(note[self.mconfig['ioflds']['im']])
         omask = img2path(note[self.mconfig['ioflds']['om']])
 
-        if note_id is None or note_id.count("-") != 2:
+        if note_id is None or note_id.count("-") < 2:
             msg = "Editing unavailable: Invalid image occlusion Note ID"
             return msg, None
         elif not omask or not image_path:
@@ -388,6 +390,7 @@ class ImgOccAdd(object):
         skip_flds = self.sconf['io_models_map'][model_map['short_name']]['flds']
         skip_flds_name = [v for (k,v) in skip_flds.items() if k in skip_flds_id]
         logging.debug(f'skip_flds_name: {skip_flds_name}')
+        logging.debug(f'dialog.tedit: {dialog.tedit}')
         for i in model_config['mflds']:
             fn = i['name']
             if fn in model_config['ioflds_priv']:

@@ -30,6 +30,7 @@ from aqt.utils import tooltip, showWarning
 
 from .ngen import *
 from .config import *
+from .config import ed_fill_opacity
 
 from .editor import ImgOccEdit
 from .dialogs import ioCritical, ioInfo
@@ -50,7 +51,7 @@ svg_edit_fonts = "'Helvetica LT Std', Arial, sans-serif"
 svg_edit_queryitems = [('initStroke[opacity]', '1'),
                        ('showRulers', 'false'),
                        ('extensions', svg_edit_ext),
-                       ('initOpacity', '0.3')]
+                       ('initOpacity', str(ed_fill_opacity))]
 
 
 class ImgOccAdd(object):

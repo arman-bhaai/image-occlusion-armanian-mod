@@ -609,23 +609,7 @@ iocard_front_li = """\
 <div id="io-qextra">{{%(ext_q)s}}</div>
 <div id="io-wrapper">
   <div id="io-overlay">{{%(q_img)s}}</div>
-  <div id="io-original">{{%(src_img)s}}</div>
 </div>
-
-<script>
-// Prevent original image from loading before mask
-aFade = 50, qFade = 0;
-var mask = document.querySelector('#io-overlay>img');
-function loaded() {
-    var original = document.querySelector('#io-original');
-    original.style.visibility = "visible";
-}
-if (mask === null || mask.complete) {
-    loaded();
-} else {
-    mask.addEventListener('load', loaded);
-}
-</script>
 {{/%(src_img)s}}
 """ % \
     {'que': IO_FLDS_LI['qm'],
@@ -647,9 +631,7 @@ iocard_back_li = """\
 {{/%(ext_q)s}}
 <div id="io-wrapper">
   <div id="io-overlay">{{%(a_img)s}}</div>
-  <div id="io-original">{{%(src_img)s}}</div>
 </div>
-<button id="io-revl-btn" onclick="toggle();">Toggle Masks</button>
 <div id="io-extra-wrapper">
   <div id="io-extra">
     {{#%(ext_a)s}}
@@ -664,30 +646,6 @@ iocard_back_li = """\
     {{/%(ext_mnem)s}}
   </div>
 </div>
-
-<script>
-// Toggle answer mask on clicking the image
-var toggle = function() {
-  var amask = document.getElementById('io-overlay');
-  if (amask.style.display === 'block' || amask.style.display === '')
-    amask.style.display = 'none';
-  else
-    amask.style.display = 'block'
-}
-
-// Prevent original image from loading before mask
-aFade = 50, qFade = 0;
-var mask = document.querySelector('#io-overlay>img');
-function loaded() {
-    var original = document.querySelector('#io-original');
-    original.style.visibility = "visible";
-}
-if (mask === null || mask.complete) {
-    loaded();
-} else {
-    mask.addEventListener('load', loaded);
-}
-</script>
 {{/%(src_img)s}}
 """ % \
     {'que': IO_FLDS_LI['qm'],
@@ -716,14 +674,6 @@ iocard_css_li = """\
   top:0;
   width:100%;
   z-index:3
-}
-
-#io-original {
-  position:relative;
-  top:0;
-  width:100%;
-  z-index:2;
-  visibility: hidden;
 }
 
 #io-wrapper {

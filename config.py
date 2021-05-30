@@ -26,7 +26,6 @@ from aqt import mw
 global IO_HOME, IO_HOTKEY
 global IO_FLDS_OA, IO_FLDS_AO
 
-ONLY_MOD_BUTTONS = True
 
 IO_MODELS_MAP = {
     'ao': {
@@ -172,11 +171,16 @@ default_conf_syncd = {'version': 0.02,
                       'afill': '185adb', # fill for answer masks
                       'rev_afill': '064420', # fill for reverse answer masks
                       'hider_fill': 'FFFFFF',
+                      'ed_fill_opacity': 0.2, # fill opacity for masks in svg editor
                       'scol': '2D2D2D',
                       'swidth': 3,
                       'font': 'Arial',
                       'fsize': 24,
+                      'only_mod_buttons': True, # if True, it removes/disables glutanimate's occlusion buttons
                       'io_models_map': IO_MODELS_MAP}
+
+ONLY_MOD_BUTTONS = default_conf_syncd['only_mod_buttons']
+ed_fill_opacity = default_conf_syncd['ed_fill_opacity']
 
 from . import template
 

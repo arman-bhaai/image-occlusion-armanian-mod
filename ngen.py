@@ -410,6 +410,9 @@ class ImgOccNoteGenerator(object):
         mask_file.close()
         return mask_path
 
+    def _save_img(self, img_obj, note_id, mtype):
+        pass
+
     def removeBlanks(self, node):
         for x in node.childNodes:
             if x.nodeType == node.TEXT_NODE:
@@ -506,7 +509,7 @@ class IoGenOA(ImgOccNoteGenerator):
 
 import xml.etree.ElementTree as ET
 import re
-from PIL import Image, ImageDraw
+from PIL import Image
 
 class IoGenSI(ImgOccNoteGenerator):
     """
@@ -1162,15 +1165,7 @@ class IoGenLI(IoGenSI):
         IoGenSI.__init__(self, ed, svg, image_path,
                                      opref, tags, fields, did, note_tp)
 
-    def _save_img(self, img_obj, note_id, mtype):
-        """Write image in media collection"""
-        logging.debug("!saving %s, %s", note_id, mtype)
-        # media collection is the working directory:
-        img_path = '%s-%s.png' % (note_id, mtype)
-        img_obj.save(img_path)
-        return img_path
-
-    def _saveMaskAndReturnNote(self, omask_path, qmask, amask, img_obj_q, img_obj_a,
+    def _saveMaskAndReturnNote(self, omask_path, qmask, amask, image_obj_q, image_obj_a,
                                img, note_id, nid=None):
         """Write actual note for given qmask and amask"""
         fields = self.fields
@@ -1180,13 +1175,10 @@ class IoGenLI(IoGenSI):
         fields[ioflds['im']] = img
         if omask_path:
             # Occlusions updated
-            q_img_path = self._save_img(img_obj_q, note_id, 'Q')
-            a_img_path = self._save_img(img_obj_a, note_id, 'A')
-            fields[ioflds['q_img']] = fname2img(q_img_path)
-            fields[ioflds['a_img']] = fname2img(a_img_path)
             qmask_path = self._saveMask(qmask, note_id, "Q")
             amask_path = self._saveMask(amask, note_id, "A")
             fields[ioflds['qm']] = fname2img(qmask_path)
+            fields[ioflds['am']] = fname2img(amask_path)
             fields[ioflds['om']] = fname2img(omask_path)
             fields[ioflds['id']] = note_id
 
@@ -1214,66 +1206,21 @@ class IoGenLI(IoGenSI):
             mw.col.addNote(note)
             logging.debug("!notecreate %s", note)
 
-    def create_qmask_img(self, q_elm_svg, fill, q_wrapper_img, q_wrapper_svg):
-        """process question image mask"""
-        (qe_width, qe_height) = (float(q_elm_svg.get('width')), float(q_elm_svg.get('height')))
-        (qe_x, qe_y) = (float(q_elm_svg.get('x')), float(q_elm_svg.get('y'))) # qe means q_elm
-        # this is gonna be an invisible wrapper for q_mask 
-        qmask_wrapper = Image.new('RGB', (int(qe_width)+1, int(qe_height)+1), '#0000FF')
-        # Image.new() doesn't support float arguments, that's why we are using ImageDraw class and do some workarounds
-        qmask_wrapper.putalpha(100) # make qmask_wrapper invisible
-        qmask_draw = ImageDraw.Draw(qmask_wrapper)
-        # qmask_area = (10,10,qe_width,qe_height)
-        # # this is real qmask
-        # qmask_draw.rectangle(qmask_area, fill)
-
-        # FIXME do workarounds for float instead of pasting in int coordinate
-        (qw_x, qw_y) = (float(q_wrapper_svg.get('x')), float(q_wrapper_svg.get('y')))
-        (left, top) = (qe_x-qw_x, qe_y-qw_y)
-        q_wrapper_img.paste(qmask_wrapper, (int(left), int(top)), mask=qmask_wrapper)
-        q_wrapper_img.show()
-        # qmask_wrapper.show()
-        # print(q_wrapper)
-        print(qe_x, qe_y, qe_width, qe_height)
-        print(qmask_wrapper)
-        input('stop')
-
-    def create_amask_img(self, q_elm, fill, q_wrapper, alpha_ch=50):
-        """process answer image mask"""
-        # Variables
-        # alpha_ch - transparency level
-
-        (qe_width, qe_height) = (float(q_elm.get('width')), float(q_elm.get('height')))
+    def create_mask_img(self, q_elm, fill, alpha_ch, q_wrapper):
+        # image mask processing
+        (qe_width, qe_height) = (float(q_elm.get('width'), float(q_elm.get('height'))))
         (qe_x, qe_y) = (float(q_elm.get('x')), float(q_elm.get('y'))) # qe means q_elm
-        # answer mask area doesn't need to be perfect. so, we are ok with int values
-        q_mask = Image.new('RGB', (int(qe_width), int(qe_height)), fill)
+        q_mask = Image.new('RGB', (qe_width, qe_height), fill)
         q_mask.putalpha(alpha_ch)
-        q_wrapper.paste(q_mask, (int(qe_x), int(qe_y)), mask=q_mask)
+        q_wrapper.paste(q_mask, (qe_x, qe_y), mask=q_mask)
 
-    def create_hmask_img(self, q_elm, q_wrapper):
-        """process hider image mask"""
-        (qe_width, qe_height) = (float(q_elm.get('width')), float(q_elm.get('height')))
-        (qe_x, qe_y) = (float(q_elm.get('x')), float(q_elm.get('y'))) # qe means q_elm
-        # this is gonna be an invisible wrapper for q_mask 
-        qmask_wrapper = Image.new('RGB', (int(qe_width)+2, int(qe_height)+2), '#000000')
-        # Image.new() doesn't support float arguments, that's why we are using ImageDraw class and do some workarounds
-        qmask_wrapper.putalpha(0) # make qmask_wrapper invisible
-        qmask_draw = ImageDraw.Draw(qmask_wrapper)
-        qmask_area = (qe_x, qe_y, qe_x+qe_width, qe_y+qe_height)
-        # this is real qmask
-        qmask_draw.rectangle(qmask_area, self.hider_fill)
-
-        # FIXME do workarounds for float instead of pasting in int coordinate
-        q_wrapper.paste(qmask_wrapper, (int(qe_x), int(qe_y)), mask=qmask_wrapper)
-
-    def get_qwrapper_img(self, q_wrapper_svg, src_img):
-        (qw_x, qw_y, qw_width, qw_height) = (float(q_wrapper_svg.get('x')), float(q_wrapper_svg.get('y')), # qw means q_wrapper
-                                            float(q_wrapper_svg.get('width')), float(q_wrapper_svg.get('height')))
+    def get_qwrapper_img(self, q_wrapper, src_img):
+        (qw_x, qw_y, qw_width, qw_height) = (float(q_wrapper.get('x')), float(q_wrapper.get('y')), # qw means q_wrapper
+                                            float(q_wrapper.get('width')), float(q_wrapper.get('height')))
         (left, top, right, bottom) = (qw_x, qw_y, qw_x+qw_width, qw_y+qw_height)
         qw_crop_area = (left, top, right, bottom)
         cropped_qw = src_img.crop(qw_crop_area)
         logging.debug(f'cropped_qw: {cropped_qw}')
-        return cropped_qw
 
     def _generateMaskSVGsForRegular(self, side):
         """Generate a mask for each regular questions"""
@@ -1304,19 +1251,19 @@ class IoGenLI(IoGenSI):
                 if q_elm.get('fill'): # elms except g
                     q_elm.set('fill', self.qfill)
                     # process image mask
-                    self.create_qmask_img(q_elm, self.qfill, cropped_qw, q_wrapper) # qmask has no transparency
+                    self.create_mask_img(q_elm, self.qfill, 255, cropped_qw) # 255 means no transparency
                 else: # elms only g
                     for q_shape in q_elm.findall('*'):
                         if q_shape.get('fill') != 'none': # these are q shapes 
                             q_shape.set('class', 'qshape')
                             q_shape.set('fill', self.qfill)
                             # process image mask
-                            self.create_qmask_img(q_shape, self.qfill, cropped_qw)
+                            self.create_mask_img(q_shape, self.qfill, 255, cropped_qw)
                         else: # these are ommitting shapes, shape fill is set to none
                             q_shape.set('fill', self.hider_col)
                             q_shape.set('class', 'hider')
                             # process image mask
-                            self.create_hmask_img(q_shape, cropped_qw)
+                            self.create_mask_img(q_shape, self.hider_fill, 255, cropped_qw)
 
                 # preserved elms -> root, layers, titles, current q elms
                 preserved_shapes_all = [svg_node, svg_node[0], svg_node[0][0], svg_node[1], 
@@ -1361,18 +1308,18 @@ class IoGenLI(IoGenSI):
                 if q_elm.get('fill'): # elms except g
                     # q_elm.set('fill', self.qfill)
                     # process image mask
-                    self.create_amask_img(q_elm, self.qfill, cropped_qw) # amask has transparency of 50 point
+                    self.create_mask_img(q_elm, self.qfill, 50, cropped_qw)
                 else: # elms only g
                     for q_shape in q_elm.findall('*'):
                         if q_shape.get('fill') != 'none': # these are q shapes 
                             q_shape.set('class', 'ashape')
                             # q_shape.set('fill', self.qfill)
-                            self.create_amask_img(q_shape, self.qfill, cropped_qw)
+                            self.create_mask_img(q_shape, self.qfill, 50, cropped_qw)
                             
                         else: # these are ommitting shapes, shape fill is set to none
                             q_shape.set('fill', self.hider_col)
                             q_shape.set('class', 'hider')
-                            self.create_hmask_img(q_shape, cropped_qw)
+                            self.create_mask_img(q_shape, self.hider_fill, 255, cropped_qw)
 
                 # preserved elms -> root, layers, titles, current q elms
                 preserved_shapes_all = [svg_node, svg_node[0], svg_node[0][0], svg_node[1], 

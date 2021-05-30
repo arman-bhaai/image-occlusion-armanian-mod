@@ -411,7 +411,12 @@ class ImgOccNoteGenerator(object):
         return mask_path
 
     def _save_img(self, img_obj, note_id, mtype):
-        pass
+        """Write image in media collection"""
+        logging.debug("!saving %s, %s", note_id, mtype)
+        # media collection is the working directory:
+        img_path = '%s-%s.png' % (note_id, mtype)
+        img_obj.save(img_path)
+        return img_path
 
     def removeBlanks(self, node):
         for x in node.childNodes:
@@ -1165,7 +1170,7 @@ class IoGenLI(IoGenSI):
         IoGenSI.__init__(self, ed, svg, image_path,
                                      opref, tags, fields, did, note_tp)
 
-    def _saveMaskAndReturnNote(self, omask_path, qmask, amask, image_obj_q, image_obj_a,
+    def _saveMaskAndReturnNote(self, omask_path, qmask, amask, img_obj_q, img_obj_a,
                                img, note_id, nid=None):
         """Write actual note for given qmask and amask"""
         fields = self.fields
@@ -1175,10 +1180,12 @@ class IoGenLI(IoGenSI):
         fields[ioflds['im']] = img
         if omask_path:
             # Occlusions updated
+            q_img_path = self._save_img(img_obj_q, note_id, 'Q')
+            a_img_path = self._save_img(img_obj_a, note_id, 'A')
+            fields[ioflds['q_img']] = fname2img(q_img_path)
+            fields[ioflds['a_img']] = fname2img(a_img_path)
             qmask_path = self._saveMask(qmask, note_id, "Q")
-            amask_path = self._saveMask(amask, note_id, "A")
             fields[ioflds['qm']] = fname2img(qmask_path)
-            fields[ioflds['am']] = fname2img(amask_path)
             fields[ioflds['om']] = fname2img(omask_path)
             fields[ioflds['id']] = note_id
 
@@ -1206,13 +1213,17 @@ class IoGenLI(IoGenSI):
             mw.col.addNote(note)
             logging.debug("!notecreate %s", note)
 
-    def create_mask_img(self, q_elm, fill, alpha_ch, q_wrapper):
-        # image mask processing
-        (qe_width, qe_height) = (float(q_elm.get('width'), float(q_elm.get('height'))))
+    def create_mask_img(self, q_elm, fill, alpha_ch, q_wrapper_img, q_wrapper_svg):
+        """Process mask image"""
+        # PIL.Image.new() doesn't accept float coordinates, hence we're working with int coords.
+        (qe_width, qe_height) = (float(q_elm.get('width')), float(q_elm.get('height')))
         (qe_x, qe_y) = (float(q_elm.get('x')), float(q_elm.get('y'))) # qe means q_elm
-        q_mask = Image.new('RGB', (qe_width, qe_height), fill)
+        q_mask = Image.new('RGB', (int(qe_width), int(qe_height)), fill)
         q_mask.putalpha(alpha_ch)
-        q_wrapper.paste(q_mask, (qe_x, qe_y), mask=q_mask)
+        # calculate relative position for q_mask
+        (qw_x, qw_y) = (float(q_wrapper_svg.get('x')), float(q_wrapper_svg.get('y')))
+        (left, top) = (int(qe_x-qw_x)+1, int(qe_y-qw_y)+1)
+        q_wrapper_img.paste(q_mask, (left, top), mask=q_mask)
 
     def get_qwrapper_img(self, q_wrapper, src_img):
         (qw_x, qw_y, qw_width, qw_height) = (float(q_wrapper.get('x')), float(q_wrapper.get('y')), # qw means q_wrapper
@@ -1221,6 +1232,7 @@ class IoGenLI(IoGenSI):
         qw_crop_area = (left, top, right, bottom)
         cropped_qw = src_img.crop(qw_crop_area)
         logging.debug(f'cropped_qw: {cropped_qw}')
+        return cropped_qw
 
     def _generateMaskSVGsForRegular(self, side):
         """Generate a mask for each regular questions"""
@@ -1241,7 +1253,7 @@ class IoGenLI(IoGenSI):
                 logging.debug(f'src_img: {src_img}')
                 q_wrapper = mlayer_node[q_elm_idx + 1]
                 # image mask processing
-                cropped_qw = self.get_qwrapper_img(q_wrapper, src_img)
+                cropped_qw_img = self.get_qwrapper_img(q_wrapper, src_img)
     
                 # cropped_q.save('/tmp/11.png')
                 # input('img saved')
@@ -1251,19 +1263,19 @@ class IoGenLI(IoGenSI):
                 if q_elm.get('fill'): # elms except g
                     q_elm.set('fill', self.qfill)
                     # process image mask
-                    self.create_mask_img(q_elm, self.qfill, 255, cropped_qw) # 255 means no transparency
+                    self.create_mask_img(q_elm, self.qfill, 255, cropped_qw_img, q_wrapper) # 255 means no transparency
                 else: # elms only g
                     for q_shape in q_elm.findall('*'):
                         if q_shape.get('fill') != 'none': # these are q shapes 
                             q_shape.set('class', 'qshape')
                             q_shape.set('fill', self.qfill)
                             # process image mask
-                            self.create_mask_img(q_shape, self.qfill, 255, cropped_qw)
+                            self.create_mask_img(q_shape, self.qfill, 255, cropped_qw_img, q_wrapper)
                         else: # these are ommitting shapes, shape fill is set to none
                             q_shape.set('fill', self.hider_col)
                             q_shape.set('class', 'hider')
                             # process image mask
-                            self.create_mask_img(q_shape, self.hider_fill, 255, cropped_qw)
+                            self.create_mask_img(q_shape, self.hider_fill, 255, cropped_qw_img, q_wrapper)
 
                 # preserved elms -> root, layers, titles, current q elms
                 preserved_shapes_all = [svg_node, svg_node[0], svg_node[0][0], svg_node[1], 
@@ -1288,7 +1300,7 @@ class IoGenLI(IoGenSI):
                 svg_node.append(inversed_wrapper)
                 xml = self.remove_namespace(ET.tostring(svg_node).decode('utf-8'))
                 masks.append(xml)
-                images_obj.append(cropped_qw)
+                images_obj.append(cropped_qw_img)
 
         elif side == 'A':
             for q_elm_idx in self.mnode_ids.keys(): # elm might be rect/g/path/shape
@@ -1300,7 +1312,7 @@ class IoGenLI(IoGenSI):
                     elm.set('opacity', '0')
 
                 q_wrapper = mlayer_node[q_elm_idx + 1]
-                cropped_qw = self.get_qwrapper_img(q_wrapper, src_img)
+                cropped_qw_img = self.get_qwrapper_img(q_wrapper, src_img)
 
                 q_elm = mlayer_node[q_elm_idx]
                 q_elm.set('class', 'ashape')
@@ -1308,18 +1320,18 @@ class IoGenLI(IoGenSI):
                 if q_elm.get('fill'): # elms except g
                     # q_elm.set('fill', self.qfill)
                     # process image mask
-                    self.create_mask_img(q_elm, self.qfill, 50, cropped_qw)
+                    self.create_mask_img(q_elm, self.qfill, 50, cropped_qw_img, q_wrapper)
                 else: # elms only g
                     for q_shape in q_elm.findall('*'):
                         if q_shape.get('fill') != 'none': # these are q shapes 
                             q_shape.set('class', 'ashape')
                             # q_shape.set('fill', self.qfill)
-                            self.create_mask_img(q_shape, self.qfill, 50, cropped_qw)
+                            self.create_mask_img(q_shape, self.qfill, 50, cropped_qw_img, q_wrapper)
                             
                         else: # these are ommitting shapes, shape fill is set to none
                             q_shape.set('fill', self.hider_col)
                             q_shape.set('class', 'hider')
-                            self.create_mask_img(q_shape, self.hider_fill, 255, cropped_qw)
+                            self.create_mask_img(q_shape, self.hider_fill, 255, cropped_qw_img, q_wrapper)
 
                 # preserved elms -> root, layers, titles, current q elms
                 preserved_shapes_all = [svg_node, svg_node[0], svg_node[0][0], svg_node[1], 
@@ -1348,7 +1360,7 @@ class IoGenLI(IoGenSI):
                 svg_node.append(inversed_wrapper)
                 xml = self.remove_namespace(ET.tostring(svg_node).decode('utf-8'))
                 masks.append(xml)
-                images_obj.append(cropped_qw)
+                images_obj.append(cropped_qw_img)
         return masks, images_obj
                 
     def _generateMaskSVGsForReverse(self, side):

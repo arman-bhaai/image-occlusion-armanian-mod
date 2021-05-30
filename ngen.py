@@ -1169,8 +1169,9 @@ class IoGenLI(IoGenSI):
         self.note_tp = 'li'
         IoGenSI.__init__(self, ed, svg, image_path,
                                      opref, tags, fields, did, note_tp)
+                                     
 
-    def _saveMaskAndReturnNote(self, omask_path, qmask, amask, img_obj_q, img_obj_a,
+    def _saveMaskAndReturnNote(self, omask_path, qmask, img_obj_q, img_obj_a,
                                img, note_id, nid=None):
         """Write actual note for given qmask and amask"""
         fields = self.fields
@@ -1252,7 +1253,7 @@ class IoGenLI(IoGenSI):
                 logging.debug(f'self.image_path: {self.image_path}')
                 logging.debug(f'src_img: {src_img}')
                 q_wrapper = mlayer_node[q_elm_idx + 1]
-                # image mask processing
+                # get question wrapper img
                 cropped_qw_img = self.get_qwrapper_img(q_wrapper, src_img)
     
                 # cropped_q.save('/tmp/11.png')
@@ -1262,19 +1263,19 @@ class IoGenLI(IoGenSI):
 
                 if q_elm.get('fill'): # elms except g
                     q_elm.set('fill', self.qfill)
-                    # process image mask
+                    # process question image mask
                     self.create_mask_img(q_elm, self.qfill, 255, cropped_qw_img, q_wrapper) # 255 means no transparency
                 else: # elms only g
                     for q_shape in q_elm.findall('*'):
                         if q_shape.get('fill') != 'none': # these are q shapes 
                             q_shape.set('class', 'qshape')
                             q_shape.set('fill', self.qfill)
-                            # process image mask
+                            # process multiple masked question image mask
                             self.create_mask_img(q_shape, self.qfill, 255, cropped_qw_img, q_wrapper)
                         else: # these are ommitting shapes, shape fill is set to none
                             q_shape.set('fill', self.hider_col)
                             q_shape.set('class', 'hider')
-                            # process image mask
+                            # process hider image mask
                             self.create_mask_img(q_shape, self.hider_fill, 255, cropped_qw_img, q_wrapper)
 
                 # preserved elms -> root, layers, titles, current q elms
@@ -1319,18 +1320,20 @@ class IoGenLI(IoGenSI):
 
                 if q_elm.get('fill'): # elms except g
                     # q_elm.set('fill', self.qfill)
-                    # process image mask
+                    # process answer image mask
                     self.create_mask_img(q_elm, self.qfill, 50, cropped_qw_img, q_wrapper)
                 else: # elms only g
                     for q_shape in q_elm.findall('*'):
                         if q_shape.get('fill') != 'none': # these are q shapes 
                             q_shape.set('class', 'ashape')
                             # q_shape.set('fill', self.qfill)
+                            # process multiple masked answer image mask
                             self.create_mask_img(q_shape, self.qfill, 50, cropped_qw_img, q_wrapper)
                             
                         else: # these are ommitting shapes, shape fill is set to none
                             q_shape.set('fill', self.hider_col)
                             q_shape.set('class', 'hider')
+                            # process hider image mask
                             self.create_mask_img(q_shape, self.hider_fill, 255, cropped_qw_img, q_wrapper)
 
                 # preserved elms -> root, layers, titles, current q elms
@@ -1366,6 +1369,8 @@ class IoGenLI(IoGenSI):
     def _generateMaskSVGsForReverse(self, side):
         """Generate a mask for each reverse question """
         masks = []
+        images_obj = []
+        src_img = Image.open(self.image_path)
 
         if side == 'Q':
             for q_g_idx in self.rnode_ids.keys(): # g is question set
@@ -1377,16 +1382,25 @@ class IoGenLI(IoGenSI):
                     for elm in svg_node.iter(): # hide all shapes from root
                         elm.set('opacity', '0')
 
+                    q_wrapper = rlayer_node[q_g_idx + 1]
+
                     qset_elm = rlayer_node[q_g_idx]
+                    # get question wrapper img
+                    cropped_qw_img = self.get_qwrapper_img(q_wrapper, src_img)
+
                     qset_elm.set('class', 'qset')
                     q_elm = qset_elm[q_elm_idx] # this is a single question -> rect/g
                     q_elm.set('class', 'qshape')
                     if q_elm.get('fill'): # elms except g
                         q_elm.set('fill', self.qfill)
+                        # process question image mask
+                        self.create_mask_img(q_elm, self.qfill, 255, cropped_qw_img, q_wrapper) # 255 means no transparency
                     else: # elms only g
                         for q_shape in q_elm.findall('*'):
                             q_shape.set('class', 'qshape')
                             q_shape.set('fill', self.qfill)
+                            # process multiple masked question image mask
+                            self.create_mask_img(q_shape, self.qfill, 255, cropped_qw_img, q_wrapper)
 
                     # preserved elms -> root, layers, titles, current q elms
                     preserved_shapes_all = [svg_node, svg_node[0], svg_node[0][0], svg_node[1], 
@@ -1399,7 +1413,6 @@ class IoGenLI(IoGenSI):
                     preserved_shapes_ques += [i for i in  qset_elm.findall('*') if i.get('fill') == 'none']
                     preserved_shapes_all += preserved_shapes_ques
 
-                    q_wrapper = rlayer_node[q_g_idx + 1]
 
                     for elm in svg_node.iter():
                         if elm in preserved_shapes_all: # unhide current q shapes and default shapes
@@ -1413,11 +1426,14 @@ class IoGenLI(IoGenSI):
                                 elm.set('opacity', '1')
                                 elm.set('fill', self.hider_col)
                                 elm.set('class', 'hider')
+                                # process hider image mask
+                                self.create_mask_img(q_shape, self.hider_fill, 255, cropped_qw_img, q_wrapper)
                             
                     inversed_wrapper = self.inverse_wrapper(q_wrapper, svg_node, self.regular_inverse_fill)
                     svg_node.append(inversed_wrapper)
                     xml = self.remove_namespace(ET.tostring(svg_node).decode('utf-8'))
                     masks.append(xml)
+                    images_obj.append(cropped_qw_img)
 
         elif side == 'A':
             for q_g_idx in self.rnode_ids.keys(): # g is question set
@@ -1429,16 +1445,23 @@ class IoGenLI(IoGenSI):
                     for elm in svg_node.iter(): # hide all shapes from root
                         elm.set('opacity', '0')
 
+                    q_wrapper = rlayer_node[q_g_idx + 1]
+                    cropped_qw_img = self.get_qwrapper_img(q_wrapper, src_img)
+
                     qset_elm = rlayer_node[q_g_idx]
                     qset_elm.set('class', 'qset')
                     q_elm = qset_elm[q_elm_idx] # this is a single question -> rect/g
                     q_elm.set('class', 'qshape')
                     if q_elm.get('fill'): # elms except g
                         q_elm.set('fill', self.qfill)
+                        # process answer image mask
+                        self.create_mask_img(q_elm, self.qfill, 50, cropped_qw_img, q_wrapper)
                     else: # elms only g
                         for q_shape in q_elm.findall('*'):
                             q_shape.set('class', 'qshape')
                             q_shape.set('fill', self.qfill)
+                            # process multiple masked answer image mask
+                            self.create_mask_img(q_shape, self.qfill, 50, cropped_qw_img, q_wrapper)
 
                     # preserved elms -> root, layers, titles, current q elms
                     preserved_shapes_all = [svg_node, svg_node[0], svg_node[0][0], svg_node[1], 
@@ -1452,7 +1475,6 @@ class IoGenLI(IoGenSI):
                     preserved_shapes_ques += [i for i in  qset_elm.findall('*') if i.get('fill') == 'none']
                     preserved_shapes_all += preserved_shapes_ques
 
-                    q_wrapper = rlayer_node[q_g_idx + 1]
 
                     for elm in svg_node.iter():
                         if elm in preserved_shapes_all: # unhide current q shapes and default shapes
@@ -1466,12 +1488,101 @@ class IoGenLI(IoGenSI):
                                 elm.set('opacity', '1')
                                 elm.set('fill', self.hider_col)
                                 elm.set('class', 'hider')
+                                # process hider image mask
+                                self.create_mask_img(q_shape, self.hider_fill, 255, cropped_qw_img, q_wrapper)
 
                     inversed_wrapper = self.inverse_wrapper(q_wrapper, svg_node, self.reverse_inverse_fill)
                     svg_node.append(inversed_wrapper)
                     xml = self.remove_namespace(ET.tostring(svg_node).decode('utf-8'))
                     masks.append(xml)  
-        return masks
+        return masks, images_obj
+
+    def updateNotes(self):
+        """Update existing notes"""
+        state = "default"
+        self.uniq_id = self.opref['uniq_id']
+        self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
+        omask_path = None
+
+        self._findAllNotes()
+        (svg_node, mlayer_node, rlayer_node) = self._getMnodesAndSetIds(True) ###@ edt oneln
+        if not (self.mnode_ids or self.rnode_ids) : ###@ add oneitm
+            tooltip("No shapes left. You can't delete all cards.<br>\
+                Are you sure you set your masks correctly?")
+            return False
+        mw.checkpoint("Editing Image Occlusion Cards")
+        ret = self._deleteAndIdNotes(mlayer_node, rlayer_node)
+        if not ret:
+            # confirmation window rejected
+            return False
+        else:
+            (del_count, new_count) = ret
+
+        svg_node = self.strip_attr(svg_node)
+        self.new_svg = self.remove_namespace(ET.tostring(svg_node).decode('utf-8'))  # write changes to svg
+        old_svg = self._getOriginalSvg()  # load original svg
+        logging.debug(f'self.new_svg {self.new_svg}')
+        logging.debug(f'old_svg {old_svg}')
+        if self.new_svg != old_svg:
+            # updated masks
+            omask_path = self._saveMask(self.new_svg, self.occl_id, "O")
+            # qmasks = self._generateMaskSVGsFor("Q")
+            # amasks = self._generateMaskSVGsFor("A")
+            (reg_qmasks, reg_images_obj_q) = self._generateMaskSVGsForRegular("Q")
+            (reg_amasks, reg_images_obj_a) = self._generateMaskSVGsForRegular("A")
+            (rev_qmasks, rev_images_obj_q) = self._generateMaskSVGsForReverse("Q")
+            (rev_amasks, rev_images_obj_a) = self._generateMaskSVGsForReverse("A")
+            state = "reset"
+            logging.debug(f'reg_qmasks {reg_qmasks}')
+            logging.debug(f'reg_amasks {reg_amasks}')
+            logging.debug(f'rev_qmasks {rev_qmasks}')
+            logging.debug(f'rev_amasks {rev_amasks}')
+
+        image_path = mw.col.media.addFile(self.image_path)
+        img = fname2img(image_path)
+
+        # for regular q
+        logging.debug("mnode_indexes %s", self.mnode_ids.keys())
+        for nr, idx in enumerate(self.mnode_ids.keys()):
+            logging.debug("========= regular q ============")
+            logging.debug("nr %s", nr)
+            logging.debug("idx %s", idx)
+            note_id = self.mnode_ids[idx]
+            q_nid = mw.col.findNotes(f'"{self.mconfig["ioflds"]["id"]}:{note_id}"')
+            logging.debug("note_id %s", note_id)
+            logging.debug("self.nids %s", self.nids)
+            nid = self.nids[note_id]
+            logging.debug("nid %s", nid)
+            if omask_path:
+                if not q_nid:
+                    self._saveMaskAndReturnNote(omask_path, reg_qmasks[nr], reg_images_obj_q[nr], reg_images_obj_a[nr], img, note_id)
+            else:
+                self._saveMaskAndReturnNote(None, None, None,
+                                            img, note_id, nid)
+        # for reverse q
+        logging.debug("rnode_ids %s", self.rnode_ids)
+        nr = 0
+        for qset_idx in self.rnode_ids.keys():
+            for q_idx in self.rnode_ids[qset_idx].keys():
+                logging.debug("========= rev q ============")
+                logging.debug("nr %s", nr)
+                logging.debug("qset_idx %s", qset_idx)
+                logging.debug("q_idx %s", q_idx)
+                note_id = self.rnode_ids[qset_idx][q_idx]
+                q_nid = mw.col.findNotes(f'"{self.mconfig["ioflds"]["id"]}:{note_id}"')
+                logging.debug("note_id %s", note_id)
+                logging.debug("self.nids %s", self.nids)
+                nid = self.nids[note_id]
+                logging.debug("nid %s", nid)
+                if omask_path:
+                    if not q_nid:
+                        self._saveMaskAndReturnNote(omask_path, rev_qmasks[nr], rev_images_obj_q[nr], rev_images_obj_a[nr], img, note_id)
+                else:
+                    self._saveMaskAndReturnNote(None, None, None,
+                                                img, note_id, nid)
+                nr+=1
+        self._showUpdateTooltip(del_count, new_count)
+        return state
 
     def generateNotes(self):
         """Generate new notes"""
@@ -1498,21 +1609,31 @@ class IoGenLI(IoGenSI):
         omask_path = self._saveMask(self.new_svg, self.occl_id, "O")
         (reg_qmasks, reg_images_obj_q) = self._generateMaskSVGsForRegular("Q")
         (reg_amasks, reg_images_obj_a) = self._generateMaskSVGsForRegular("A")
-        rev_qmasks = self._generateMaskSVGsForReverse("Q")
-        rev_amasks = self._generateMaskSVGsForReverse("A")
+        (rev_qmasks, rev_images_obj_q) = self._generateMaskSVGsForReverse("Q")
+        (rev_amasks, rev_images_obj_a) = self._generateMaskSVGsForReverse("A")
+        logging.debug(f'reg_qmasks {reg_qmasks}')
+        logging.debug(f'reg_amasks {reg_amasks}')
+        logging.debug(f'rev_qmasks {rev_qmasks}')
+        logging.debug(f'rev_amasks {rev_amasks}')
+        logging.debug(f'reg_images_obj_q {reg_images_obj_q}')
+        logging.debug(f'reg_amasks_obj_a {reg_images_obj_a}')
+        logging.debug(f'rev_images_obj_q {rev_images_obj_q}')
+        logging.debug(f'rev_amasks_obj_a {rev_images_obj_a}')
         image_path = mw.col.media.addFile(self.image_path)
         img = fname2img(image_path)
 
         mw.checkpoint("Adding Image Occlusion Cards")
+        # add regular questions
         for nr, idx in enumerate(self.mnode_ids.keys()):
             note_id = self.mnode_ids[idx]
-            self._saveMaskAndReturnNote(omask_path, reg_qmasks[nr], reg_amasks[nr], reg_images_obj_q[nr], reg_images_obj_a[nr], img, note_id)
+            self._saveMaskAndReturnNote(omask_path, reg_qmasks[nr], reg_images_obj_q[nr], reg_images_obj_a[nr], img, note_id)
 
+        # add reverse questions
         nr = 0                          
         for g_idx in self.rnode_ids.keys():
             for rnode_idx in self.rnode_ids[g_idx]:
                 note_id = self.rnode_ids[g_idx][rnode_idx]
-                self._saveMaskAndReturnNote(omask_path, rev_qmasks[nr], rev_amasks[nr], img, note_id)
+                self._saveMaskAndReturnNote(omask_path, rev_qmasks[nr], rev_images_obj_q[nr], rev_images_obj_a[nr], img, note_id)
                 nr += 1
         tooltip(f"{len(reg_qmasks)+len(rev_qmasks)} cards <b>added</b><br>regular: {len(reg_qmasks)}<br>reverse: {len(rev_qmasks)}", parent=None)
         return state

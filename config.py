@@ -118,7 +118,7 @@ IO_MODELS_MAP = {
         'short_name': 'li',
         'name': 'Image Occlusion ArMOD LI',
         'fld_ids': ['id', 'q_img', 'a_img', 'ext_q', # TODO: Use IDs instead of names to make these compatible with self.ioflds
-                    'ext_a', 'ext_mnem', 'im', 'qm', 'om', 'hd'],
+                    'ext_a', 'ext_mnem', 'im', 'qm', 'om', 'hd', 'am'],
         'flds': {
             'id': "ID (hidden)",
             'q_img': 'Question Image',
@@ -129,7 +129,8 @@ IO_MODELS_MAP = {
             'im': "Image",
             'qm': "Question Mask",
             'om': "Original Mask",
-            'hd': "Header"
+            'hd': "Header",
+            'am': "Answer Mask", # TODO 'am' is obsolete for now, might be use later for li to si conversion and vice versa
         },
         'card1': {
             'name': 'IO ArMOD Card LI',
@@ -166,8 +167,10 @@ default_conf_local = {'version': 0.02,
                       'hotkey': IO_HOTKEY}
 default_conf_syncd = {'version': 0.02,
                       'ofill': '7f007f',
-                      'qfill': 'FF7E7E',
-                      'rev_afill': '185adb', # qfill for reverse answers
+                      'qfill': 'FF7E7E', # fill for regular question masks
+                      'rev_qfill': 'FF7E7E', # fill for reverse question masks
+                      'afill': '185adb', # fill for answer masks
+                      'rev_afill': '064420', # fill for reverse answer masks
                       'hider_fill': 'FFFFFF',
                       'scol': '2D2D2D',
                       'swidth': 3,

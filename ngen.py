@@ -26,7 +26,7 @@ from aqt.utils import tooltip
 from anki.notes import Note
 
 from xml.dom import minidom
-import uuid
+import time
 
 from .dialogs import ioAskUser
 from .utils import fname2img
@@ -74,8 +74,10 @@ class ImgOccNoteGenerator(object):
         self.tags = tags
         self.fields = fields
         self.did = did
-        self.qfill = '#' + mw.col.conf['imgocc_armod']['qfill']
-        self.rev_afill = '#' + mw.col.conf['imgocc_armod']['rev_afill'] # qfill for li reversed answers
+        self.qfill = '#' + mw.col.conf['imgocc_armod']['qfill'] # fill for regular question masks
+        self.rev_qfill = '#' + mw.col.conf['imgocc_armod']['rev_qfill'] # fill for reverse question masks
+        self.afill = '#' + mw.col.conf['imgocc_armod']['afill'] # fill for answer masks
+        self.rev_afill = '#' + mw.col.conf['imgocc_armod']['rev_afill'] # fill for reverse answer masks
         self.hider_fill = '#' + mw.col.conf['imgocc_armod']['hider_fill']
         self.note_tp = note_tp
         loadConfig(self)
@@ -84,7 +86,8 @@ class ImgOccNoteGenerator(object):
     def generateNotes(self):
         """Generate new notes"""
         state = "default"
-        self.uniq_id = str(uuid.uuid4()).replace("-", "")
+        epoch_secs = int(time.time())
+        self.uniq_id = str(epoch_secs) # unique id is epoch as seconds
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
 
         (svg_node, layer_node) = self._getMnodesAndSetIds()
@@ -570,7 +573,7 @@ class IoGenSI(ImgOccNoteGenerator):
         ###@ add block end
         # filter out notes that have already been deleted manually
         exstg_tnode_note_ids = [x for x in valid_tnode_note_ids if x in valid_nid_note_ids]
-        exstg_tnode_note_nrs = sorted([int(i.split('-')[-1]) for i in exstg_tnode_note_ids])
+        exstg_tnode_note_nrs = sorted([int(i.split('-')[-2].split('_')[-1]) for i in exstg_tnode_note_ids])
         # determine available nrs available for note numbering
         if not exstg_tnode_note_nrs:
             # only the case if the user deletes all existing shapes
@@ -622,7 +625,7 @@ class IoGenSI(ImgOccNoteGenerator):
                     # increment maximum note_id number
                     note_nr_max = note_nr_max + 1
                     note_nr = note_nr_max
-                new_mnode_id = self.occl_id + '-regularq_qedt_card-' + str(note_nr) # edt means cards created by editing
+                new_mnode_id = self.occl_id +'-card_'+ str(note_nr)+ '-regularq_qedt'  # edt means cards created by editing
                 new_count += 1
                 nids[new_mnode_id] = None
 
@@ -656,7 +659,7 @@ class IoGenSI(ImgOccNoteGenerator):
                         # increment maximum note_id number
                         note_nr_max = note_nr_max + 1
                         note_nr = note_nr_max
-                    new_rnode_id = self.occl_id + '-reverseq_qsetedt_card-' + str(note_nr)
+                    new_rnode_id = self.occl_id +'-card_'+str(note_nr) + '-reverseq_qsetedt'
                     new_count += 1
                     nids[new_rnode_id] = None
 
@@ -879,12 +882,12 @@ class IoGenSI(ImgOccNoteGenerator):
                 q_elm.set('class', 'ashape')
 
                 if q_elm.get('fill'): # elms except g
-                    q_elm.set('fill', self.qfill)
+                    q_elm.set('fill', self.afill)
                 else: # elms only g
                     for q_shape in q_elm.findall('*'):
                         if q_shape.get('fill') != 'none': # these are q shapes 
                             q_shape.set('class', 'ashape')
-                            q_shape.set('fill', self.qfill)
+                            q_shape.set('fill', self.afill)
                         else: # these are ommitting shapes, shape fill is set to none
                             q_shape.set('fill', self.hider_col)
                             q_shape.set('class', 'hider')
@@ -938,11 +941,11 @@ class IoGenSI(ImgOccNoteGenerator):
                     q_elm = qset_elm[q_elm_idx] # this is a single question -> rect/g
                     q_elm.set('class', 'qshape')
                     if q_elm.get('fill'): # elms except g
-                        q_elm.set('fill', self.qfill)
+                        q_elm.set('fill', self.rev_qfill)
                     else: # elms only g
                         for q_shape in q_elm.findall('*'):
                             q_shape.set('class', 'qshape')
-                            q_shape.set('fill', self.qfill)
+                            q_shape.set('fill', self.rev_qfill)
 
                     # preserved elms -> root, layers, titles, current q elms
                     preserved_shapes_all = [svg_node, svg_node[0], svg_node[0][0], svg_node[1], 
@@ -990,11 +993,11 @@ class IoGenSI(ImgOccNoteGenerator):
                     q_elm = qset_elm[q_elm_idx] # this is a single question -> rect/g
                     q_elm.set('class', 'qshape')
                     if q_elm.get('fill'): # elms except g
-                        q_elm.set('fill', self.qfill)
+                        q_elm.set('fill', self.rev_afill)
                     else: # elms only g
                         for q_shape in q_elm.findall('*'):
                             q_shape.set('class', 'qshape')
-                            q_shape.set('fill', self.qfill)
+                            q_shape.set('fill', self.rev_afill)
 
                     # preserved elms -> root, layers, titles, current q elms
                     preserved_shapes_all = [svg_node, svg_node[0], svg_node[0][0], svg_node[1], 
@@ -1072,7 +1075,7 @@ class IoGenSI(ImgOccNoteGenerator):
             if mnode.tag != self._ns('title'):
                 if i%2 == 1: # this is a question
                     if not edit:
-                        self.mnode_ids[i] = "%s-regularq_q%i_card-%i" % (self.occl_id, count_ques, count_card)
+                        self.mnode_ids[i] = "%s-card_%i-regularq_q%i" % (self.occl_id, count_card, count_ques)
                         mnode.set("id", self.mnode_ids[i])
                     else:
                         self.mnode_ids[i] = mnode.get('id')
@@ -1098,7 +1101,7 @@ class IoGenSI(ImgOccNoteGenerator):
                     for idx_q_elm, q_elm in enumerate(rnode.findall('*')): # this is a question / hider -> rect / g / hider-rect
                         if not edit:
                             if not q_elm.get('fill') == 'none': # q elms except hider-rects
-                                q_elm_id = reverseq_g_id+'_q'+str(idx_q_elm+1)+'_card-'+str(count_card)
+                                q_elm_id = "%s-card_%i-revereseq_qset%i_q%i" % (self.occl_id, count_card, count_ques, idx_q_elm+1) 
                                 q_elm.set('id', q_elm_id)
                                 self.rnode_ids[idx_rnode][idx_q_elm] = q_elm_id
                                 count_card += 1
@@ -1118,7 +1121,8 @@ class IoGenSI(ImgOccNoteGenerator):
     def generateNotes(self):
         """Generate new notes"""
         state = "default"
-        self.uniq_id = str(uuid.uuid4()).replace("-", "")
+        epoch_secs = int(time.time())
+        self.uniq_id = str(epoch_secs) # unique id is epoch as seconds
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
 
         self.unedited_q_ids = []
@@ -1172,7 +1176,7 @@ class IoGenLI(IoGenSI):
                                      opref, tags, fields, did, note_tp)
                                      
 
-    def _saveMaskAndReturnNote(self, omask_path, qmask, img_obj_q, img_obj_a,
+    def _saveMaskAndReturnNote(self, omask_path, qmask, amask, img_obj_q, img_obj_a,
                                img, note_id, nid=None):
         """Write actual note for given qmask and amask"""
         fields = self.fields
@@ -1187,7 +1191,9 @@ class IoGenLI(IoGenSI):
             fields[ioflds['q_img']] = fname2img(q_img_path)
             fields[ioflds['a_img']] = fname2img(a_img_path)
             qmask_path = self._saveMask(qmask, note_id, "Q")
+            amask_path = self._saveMask(amask, note_id, "A")
             fields[ioflds['qm']] = fname2img(qmask_path)
+            fields[ioflds['am']] = fname2img(amask_path)
             fields[ioflds['om']] = fname2img(omask_path)
             fields[ioflds['id']] = note_id
 
@@ -1218,7 +1224,7 @@ class IoGenLI(IoGenSI):
     def create_mask_img(self, q_elm, fill, alpha_ch, q_wrapper_img, q_wrapper_svg):
         """Process mask image"""
         # PIL.Image.new() doesn't accept float coordinates, hence we're working with int coords.
-        (qe_width, qe_height) = (float(q_elm.get('width')), float(q_elm.get('height')))
+        (qe_width, qe_height) = (float(q_elm.get('width')), float(q_elm.get('height'))) # Error Raises if Reverse pattern in applied on regular layer
         (qe_x, qe_y) = (float(q_elm.get('x')), float(q_elm.get('y'))) # qe means q_elm
         q_mask = Image.new('RGB', (int(qe_width), int(qe_height)), fill)
         q_mask.putalpha(alpha_ch)
@@ -1320,14 +1326,14 @@ class IoGenLI(IoGenSI):
                 if q_elm.get('fill'): # elms except g
                     # q_elm.set('fill', self.qfill)
                     # process answer image mask
-                    self.create_mask_img(q_elm, self.qfill, 50, cropped_qw_img, q_wrapper)
+                    self.create_mask_img(q_elm, self.afill, 50, cropped_qw_img, q_wrapper)
                 else: # elms only g
                     for q_shape in q_elm.findall('*'):
                         if q_shape.get('fill') != 'none': # these are q shapes 
                             q_shape.set('class', 'ashape')
                             # q_shape.set('fill', self.qfill)
                             # process multiple masked answer image mask
-                            self.create_mask_img(q_shape, self.qfill, 50, cropped_qw_img, q_wrapper)
+                            self.create_mask_img(q_shape, self.afill, 50, cropped_qw_img, q_wrapper)
                             
                         else: # these are ommitting shapes, shape fill is set to none
                             q_shape.set('fill', self.hider_col)
@@ -1391,15 +1397,15 @@ class IoGenLI(IoGenSI):
                     q_elm = qset_elm[q_elm_idx] # this is a single question -> rect/g
                     q_elm.set('class', 'qshape')
                     if q_elm.get('fill'): # elms except g
-                        q_elm.set('fill', self.qfill)
+                        q_elm.set('fill', self.rev_qfill)
                         # process question image mask
-                        self.create_mask_img(q_elm, self.qfill, 255, cropped_qw_img, q_wrapper) # 255 means no transparency
+                        self.create_mask_img(q_elm, self.rev_qfill, 255, cropped_qw_img, q_wrapper) # 255 means no transparency
                     else: # elms only g
                         for q_shape in q_elm.findall('*'):
                             q_shape.set('class', 'qshape')
-                            q_shape.set('fill', self.qfill)
+                            q_shape.set('fill', self.rev_qfill)
                             # process multiple masked question image mask
-                            self.create_mask_img(q_shape, self.qfill, 255, cropped_qw_img, q_wrapper)
+                            self.create_mask_img(q_shape, self.rev_qfill, 255, cropped_qw_img, q_wrapper)
 
                     # preserved elms -> root, layers, titles, current q elms
                     preserved_shapes_all = [svg_node, svg_node[0], svg_node[0][0], svg_node[1], 
@@ -1426,7 +1432,7 @@ class IoGenLI(IoGenSI):
                                 elm.set('fill', self.hider_col)
                                 elm.set('class', 'hider')
                                 # process hider image mask
-                                self.create_mask_img(q_shape, self.hider_fill, 255, cropped_qw_img, q_wrapper)
+                                self.create_mask_img(elm, self.hider_fill, 255, cropped_qw_img, q_wrapper)
                             
                     inversed_wrapper = self.inverse_wrapper(q_wrapper, svg_node, self.regular_inverse_fill)
                     svg_node.append(inversed_wrapper)
@@ -1452,13 +1458,13 @@ class IoGenLI(IoGenSI):
                     q_elm = qset_elm[q_elm_idx] # this is a single question -> rect/g
                     q_elm.set('class', 'qshape')
                     if q_elm.get('fill'): # elms except g
-                        q_elm.set('fill', self.qfill)
+                        q_elm.set('fill', self.rev_afill)
                         # process answer image mask
                         self.create_mask_img(q_elm, self.rev_afill, 50, cropped_qw_img, q_wrapper)
                     else: # elms only g
                         for q_shape in q_elm.findall('*'):
                             q_shape.set('class', 'qshape')
-                            q_shape.set('fill', self.qfill)
+                            q_shape.set('fill', self.rev_afill)
                             # process multiple masked answer image mask
                             self.create_mask_img(q_shape, self.rev_afill, 50, cropped_qw_img, q_wrapper)
 
@@ -1488,7 +1494,7 @@ class IoGenLI(IoGenSI):
                                 elm.set('fill', self.hider_col)
                                 elm.set('class', 'hider')
                                 # process hider image mask
-                                self.create_mask_img(q_shape, self.hider_fill, 255, cropped_qw_img, q_wrapper)
+                                self.create_mask_img(elm, self.hider_fill, 255, cropped_qw_img, q_wrapper)
 
                     inversed_wrapper = self.inverse_wrapper(q_wrapper, svg_node, self.reverse_inverse_fill)
                     svg_node.append(inversed_wrapper)
@@ -1533,10 +1539,14 @@ class IoGenLI(IoGenSI):
             (rev_qmasks, rev_images_obj_q) = self._generateMaskSVGsForReverse("Q")
             (rev_amasks, rev_images_obj_a) = self._generateMaskSVGsForReverse("A")
             state = "reset"
-            logging.debug(f'reg_qmasks {reg_qmasks}')
-            logging.debug(f'reg_amasks {reg_amasks}')
-            logging.debug(f'rev_qmasks {rev_qmasks}')
-            logging.debug(f'rev_amasks {rev_amasks}')
+            logging.debug(f'reg_qmasks: {reg_qmasks}')
+            logging.debug(f'reg_amasks: {reg_amasks}')
+            logging.debug(f'reg_images_obj_q: {reg_images_obj_q}')
+            logging.debug(f'reg_images_obj_a: {reg_images_obj_a}')
+            logging.debug(f'rev_qmasks: {rev_qmasks}')
+            logging.debug(f'rev_amasks: {rev_amasks}')
+            logging.debug(f'rev_images_obj_q: {rev_images_obj_q}')
+            logging.debug(f'rev_images_obj_a: {rev_images_obj_a}')
 
         image_path = mw.col.media.addFile(self.image_path)
         img = fname2img(image_path)
@@ -1555,7 +1565,7 @@ class IoGenLI(IoGenSI):
             logging.debug("nid %s", nid)
             if omask_path:
                 if not q_nid:
-                    self._saveMaskAndReturnNote(omask_path, reg_qmasks[nr], reg_images_obj_q[nr], reg_images_obj_a[nr], img, note_id)
+                    self._saveMaskAndReturnNote(omask_path, reg_qmasks[nr], reg_amasks[nr], reg_images_obj_q[nr], reg_images_obj_a[nr], img, note_id)
             else:
                 self._saveMaskAndReturnNote(None, None, None,
                                             img, note_id, nid)
@@ -1576,7 +1586,7 @@ class IoGenLI(IoGenSI):
                 logging.debug("nid %s", nid)
                 if omask_path:
                     if not q_nid:
-                        self._saveMaskAndReturnNote(omask_path, rev_qmasks[nr], rev_images_obj_q[nr], rev_images_obj_a[nr], img, note_id)
+                        self._saveMaskAndReturnNote(omask_path, rev_qmasks[nr], rev_amasks[nr], rev_images_obj_q[nr], rev_images_obj_a[nr], img, note_id)
                 else:
                     self._saveMaskAndReturnNote(None, None, None,
                                                 img, note_id, nid)
@@ -1587,7 +1597,8 @@ class IoGenLI(IoGenSI):
     def generateNotes(self):
         """Generate new notes"""
         state = "default"
-        self.uniq_id = str(uuid.uuid4()).replace("-", "")
+        epoch_secs = int(time.time())
+        self.uniq_id = str(epoch_secs) # unique id is epoch as seconds
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
 
         self.unedited_q_ids = []
@@ -1626,14 +1637,14 @@ class IoGenLI(IoGenSI):
         # add regular questions
         for nr, idx in enumerate(self.mnode_ids.keys()):
             note_id = self.mnode_ids[idx]
-            self._saveMaskAndReturnNote(omask_path, reg_qmasks[nr], reg_images_obj_q[nr], reg_images_obj_a[nr], img, note_id)
+            self._saveMaskAndReturnNote(omask_path, reg_qmasks[nr], reg_amasks[nr], reg_images_obj_q[nr], reg_images_obj_a[nr], img, note_id)
 
         # add reverse questions
         nr = 0                          
         for g_idx in self.rnode_ids.keys():
             for rnode_idx in self.rnode_ids[g_idx]:
                 note_id = self.rnode_ids[g_idx][rnode_idx]
-                self._saveMaskAndReturnNote(omask_path, rev_qmasks[nr], rev_images_obj_q[nr], rev_images_obj_a[nr], img, note_id)
+                self._saveMaskAndReturnNote(omask_path, rev_qmasks[nr], rev_amasks[nr], rev_images_obj_q[nr], rev_images_obj_a[nr], img, note_id)
                 nr += 1
         tooltip(f"{len(reg_qmasks)+len(rev_qmasks)} cards <b>added</b><br>regular: {len(reg_qmasks)}<br>reverse: {len(rev_qmasks)}", parent=None)
         return state

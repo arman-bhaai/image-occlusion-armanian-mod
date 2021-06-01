@@ -169,6 +169,8 @@ class ImgOccEdit(QDialog):
                                            QDialogButtonBox.ActionRole)
         self.li_btn = button_box.addButton("Process &Long Image",
                                            QDialogButtonBox.ActionRole)
+        self.sli_btn = button_box.addButton("Process S&implified Long Image",
+                                           QDialogButtonBox.ActionRole)
         close_button = button_box.addButton("&Close",
                                             QDialogButtonBox.RejectRole)
 
@@ -185,6 +187,8 @@ class ImgOccEdit(QDialog):
                  "Consumes less storage")
         li_tt = ("Generate cards from processing long source image<br>"
                  "Consumes high storage")
+        sli_tt = ("Generate cards from processing long source image<br>"
+                 "Consumes high storage. Process question line by line. Most efficient for Exams")
         close_tt = "Close Image Occlusion Editor without generating cards"
 
         image_btn.setToolTip(image_tt)
@@ -194,13 +198,14 @@ class ImgOccEdit(QDialog):
         self.oa_btn.setToolTip(oa_tt)
         self.si_btn.setToolTip(si_tt)
         self.li_btn.setToolTip(li_tt)
+        self.sli_btn.setToolTip(sli_tt)
         close_button.setToolTip(close_tt)
         self.occl_tp_select.setItemData(0, dc_tt, Qt.ToolTipRole)
         self.occl_tp_select.setItemData(1, ao_tt, Qt.ToolTipRole)
         self.occl_tp_select.setItemData(2, oa_tt, Qt.ToolTipRole)
 
         for btn in [image_btn, self.edit_btn, self.new_btn, self.ao_btn,
-                    self.oa_btn, self.si_btn, self.li_btn, close_button]:
+                    self.oa_btn, self.si_btn, self.sli_btn, self.li_btn, close_button]:
             btn.setFocusPolicy(Qt.ClickFocus)
 
         self.edit_btn.clicked.connect(self.editNote)
@@ -209,6 +214,7 @@ class ImgOccEdit(QDialog):
         self.oa_btn.clicked.connect(self.addOA)
         self.si_btn.clicked.connect(self.add_si)
         self.li_btn.clicked.connect(self.add_li)
+        self.sli_btn.clicked.connect(self.add_sli)
         close_button.clicked.connect(self.close)
 
         # Set basic layout up
@@ -301,7 +307,8 @@ class ImgOccEdit(QDialog):
 
     def defaultAction(self, close):
         if self.mode == "add":
-            self.addAO(close)
+            # self.addAO(close)
+            self.add_sli(close)
         else:
             self.editNote()
 
@@ -316,6 +323,9 @@ class ImgOccEdit(QDialog):
 
     def add_li(self, close=False):
         self.imgoccadd.onAddNotesButton("li", close, 'li')
+
+    def add_sli(self, close=False):
+        self.imgoccadd.onAddNotesButton("sli", close, 'sli')
 
     def new(self, close=False):
         choice = self.occl_tp_select.currentText()
@@ -381,7 +391,7 @@ class ImgOccEdit(QDialog):
     def switchToMode(self, mode):
         """Toggle between add and edit layouts"""
         hide_on_add = [self.occl_tp_select, self.edit_btn, self.new_btn]
-        hide_on_edit = [self.ao_btn, self.oa_btn, self.si_btn, self.li_btn]
+        hide_on_edit = [self.ao_btn, self.oa_btn, self.sli_btn, self.si_btn, self.li_btn]
         hide_forever = []
         if ONLY_MOD_BUTTONS:
             hide_forever = [self.occl_tp_select, self.new_btn, self.ao_btn, self.oa_btn]

@@ -20,7 +20,7 @@ import logging
 logging.debug(f'Running: {__name__}')
 
 from .config import *
-from .config import IO_FLDS_OA, IO_FLDS_AO, IO_FLDS_SI, IO_FLDS_LI, DFLT_MODEL
+from .config import IO_FLDS_OA, IO_FLDS_AO, IO_FLDS_SI, IO_FLDS_LI, DFLT_MODEL, IO_FLDS_SLI
 
 # DEFAULT CARD TEMPLATES
 iocard_front_ao = """\
@@ -735,6 +735,140 @@ iocard_css_li = """\
 """
 
 
+iocard_front_sli = """\
+
+
+{{#%(src_img)s}}
+<div id="io-header">{{%(header)s}}</div>
+<div id="io-qextra">{{%(ext_q)s}}</div>
+<div id="io-wrapper">
+  <div id="io-overlay">{{%(q_img)s}}</div>
+</div>
+{{/%(src_img)s}}
+""" % \
+    {'que': IO_FLDS_SLI['qm'],
+     'svg': IO_FLDS_SLI['om'],
+     'src_img': IO_FLDS_SLI['im'],
+     'header': IO_FLDS_SLI['hd'],
+     'ext_q': IO_FLDS_SLI['ext_q'],
+     'ext_a': IO_FLDS_SLI['ext_a'],
+     'ext_mnem': IO_FLDS_SLI['ext_mnem'],
+     'q_img': IO_FLDS_SLI['q_img'],
+     'a_img': IO_FLDS_SLI['a_img']}
+
+
+iocard_back_sli = """\
+{{#%(src_img)s}}
+<div id="io-header">{{%(header)s}}</div>
+{{#%(ext_q)s}}
+<div id="io-qextra">{{%(ext_q)s}}</div>
+{{/%(ext_q)s}}
+<div id="io-wrapper">
+  <div id="io-overlay">{{%(a_img)s}}</div>
+</div>
+<div id="io-extra-wrapper">
+  <div id="io-extra">
+    {{#%(ext_a)s}}
+    <div id="io-aextra">
+      <div class="io-field-descr">%(ext_a)s</div>{{%(ext_a)s}}
+    </div>
+    {{/%(ext_a)s}}
+    {{#%(ext_mnem)s}}
+    <div id="io-mnemonics">
+      <div class="io-field-descr">%(ext_mnem)s</div>{{%(ext_mnem)s}}
+    </div>
+    {{/%(ext_mnem)s}}
+  </div>
+</div>
+{{/%(src_img)s}}
+""" % \
+    {'que': IO_FLDS_SLI['qm'],
+     'svg': IO_FLDS_SLI['om'],
+     'src_img': IO_FLDS_SLI['im'],
+     'header': IO_FLDS_SLI['hd'],
+     'ext_q': IO_FLDS_SLI['ext_q'],
+     'ext_a': IO_FLDS_SLI['ext_a'],
+     'ext_mnem': IO_FLDS_SLI['ext_mnem'],
+     'q_img': IO_FLDS_SLI['q_img'],
+     'a_img': IO_FLDS_SLI['a_img']}
+
+iocard_css_sli = """\
+/* GENERAL CARD STYLE */
+.card {
+  font-family: "Helvetica LT Std", Helvetica, Arial, Sans;
+  font-size: 150%;
+  text-align: center;
+  color: black;
+  background-color: white;
+}
+
+/* OCCLUSION CSS START - don't edit this */
+#io-overlay {
+  position:absolute;
+  top:0;
+  width:100%;
+  z-index:3
+}
+
+#io-wrapper {
+  position:relative;
+  width: 100%;
+}
+/* OCCLUSION CSS END */
+
+/* OTHER STYLES */
+#io-header{
+  font-size: 1.1em;
+  margin-bottom: 0.2em;
+}
+
+#io-qextra, #io-aextra, #io-mnemonics{
+  /* the wrapper is needed to center the
+  left-aligned blocks below it */
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0.5em;
+}
+
+#io-extra{
+  text-align:center;
+  display: inline-block;
+}
+
+.io-extra-entry{
+  margin-top: 0.8em;
+  font-size: 0.9em;
+  text-align:left;
+}
+
+.io-field-descr{
+  margin-bottom: 0.2em;
+  font-weight: bold;
+  font-size: 1em;
+}
+
+#io-revl-btn {
+  font-size: 0.5em;
+}
+
+/* ADJUSTMENTS FOR MOBILE DEVICES */
+
+.mobile .card, .mobile #content {
+  font-size: 120%;
+  margin: 0;
+}
+
+.mobile #io-qextra, .mobile #io-aextra, .mobile #io-mnemonics, {
+  width: 95%;
+}
+
+.mobile #io-revl-btn {
+  font-size: 0.8em;
+}
+"""
+
+
 # INCREMENTAL UPDATES
 
 html_overlay_onload = """\
@@ -806,6 +940,11 @@ def add_io_model(col, model_map):
       template['qfmt'] = iocard_front_li
       template['afmt'] = iocard_back_li
       io_model['css'] = iocard_css_li
+      io_model['sortf'] = 1
+    elif model_map['short_name'] == 'sli':
+      template['qfmt'] = iocard_front_sli
+      template['afmt'] = iocard_back_sli
+      io_model['css'] = iocard_css_sli
       io_model['sortf'] = 1
       
     logging.debug(f'template: {template}')

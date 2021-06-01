@@ -298,7 +298,7 @@ class ImgOccAdd(object):
         (fields, tags) = r1
         did = dialog.deckChooser.selectedId()
 
-        noteGenerator = genByKey(choice)
+        noteGenerator = genByKey(choice, note_tp)
         gen = noteGenerator(self.ed, svg, self.image_path,
                             self.opref, tags, fields, did, note_tp)
         r = gen.generateNotes()
@@ -339,8 +339,8 @@ class ImgOccAdd(object):
         logging.debug(f'fields: {fields}')
         did = self.opref["did"]
         old_occl_tp = self.opref["occl_tp"]
-
-        noteGenerator = genByKey(choice, old_occl_tp)
+        
+        noteGenerator = genByKey(choice, note_tp, old_occl_tp)
         gen = noteGenerator(self.ed, svg, self.image_path,
                             self.opref, tags, fields, did, note_tp)
         r = gen.updateNotes()

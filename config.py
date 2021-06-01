@@ -142,6 +142,35 @@ IO_MODELS_MAP = {
         'io_flds_prsv': ['sc'], # fields that are synced between an IO Editor session and Anki's Editor
         'sort_fld': 1 # set sortfield to header
     },
+    'sli': {
+        'short_name': 'sli',
+        'name': 'Image Occlusion ArMOD SLI',
+        'fld_ids': ['id', 'q_img', 'a_img', 'ext_q', # TODO: Use IDs instead of names to make these compatible with self.ioflds
+                    'ext_a', 'ext_mnem', 'im', 'qm', 'om', 'hd', 'am'],
+        'flds': {
+            'id': "ID (hidden)",
+            'q_img': 'Question Image',
+            'a_img': 'Answer Image',
+            'ext_q': 'Question Extra',
+            'ext_a': 'Answer Extra',
+            'ext_mnem': 'Mnemonics',
+            'im': "Image",
+            'qm': "Question Mask",
+            'om': "Original Mask",
+            'hd': "Header",
+            'am': "Answer Mask", # TODO 'am' is obsolete for now, might be use later for li to si conversion and vice versa
+        },
+        'card1': {
+            'name': 'IO ArMOD Card SLI',
+            'front': '',
+            'back': '',
+            'css': ''
+        },
+        'skip_flds': ['ext_q', 'ext_a', 'ext_mnem'],
+        'io_flds_priv': ['id', 'im', 'qm', 'om'], # fields that aren't user-editable
+        'io_flds_prsv': ['sc'], # fields that are synced between an IO Editor session and Anki's Editor
+        'sort_fld': 1 # set sortfield to header
+    },
     
 }
 
@@ -151,6 +180,7 @@ IO_FLDS_AO = IO_MODELS_MAP['ao']['flds']
 IO_FLDS_OA = IO_MODELS_MAP['oa']['flds']
 IO_FLDS_SI = IO_MODELS_MAP['si']['flds']
 IO_FLDS_LI = IO_MODELS_MAP['li']['flds']
+IO_FLDS_SLI = IO_MODELS_MAP['sli']['flds']
 
 from .template import *
 

@@ -339,7 +339,8 @@ class ImgOccAdd(object):
         logging.debug(f'fields: {fields}')
         did = self.opref["did"]
         old_occl_tp = self.opref["occl_tp"]
-
+        
+        input(f'choice: {choice}')
         noteGenerator = genByKey(choice, old_occl_tp)
         gen = noteGenerator(self.ed, svg, self.image_path,
                             self.opref, tags, fields, did, note_tp)

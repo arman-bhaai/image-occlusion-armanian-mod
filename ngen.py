@@ -56,8 +56,9 @@ def genByKey(key, old_occl_tp=None):
     elif key == 'si':
         return IoGenSI
     elif key == 'li':
+        return IoGenLI
+    elif key == 'sli':
         return IoGenSLI
-        # return IoGenLI
     else:
         return IoGenAO
 
@@ -698,6 +699,7 @@ class IoGenSI(ImgOccNoteGenerator):
 
     def updateNotes(self):
         """Update existing notes"""
+        input('hello')
         state = "default"
         self.uniq_id = self.opref['uniq_id']
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
@@ -1225,7 +1227,7 @@ class IoGenLI(IoGenSI):
     def create_mask_img(self, q_elm, fill, alpha_ch, q_wrapper_img, q_wrapper_svg):
         """Process mask image"""
         # PIL.Image.new() doesn't accept float coordinates, hence we're working with int coords.
-        (qe_width, qe_height) = (float(q_elm.get('width')), float(q_elm.get('height'))) # Error Raises if Reverse pattern in applied on regular layer
+        (qe_width, qe_height) = (float(q_elm.get('width')), float(q_elm.get('height'))) # Error Raises if Reverse pattern is applied on regular layer
         (qe_x, qe_y) = (float(q_elm.get('x')), float(q_elm.get('y'))) # qe means q_elm
         q_mask = Image.new('RGB', (int(qe_width), int(qe_height)), fill)
         q_mask.putalpha(alpha_ch)
@@ -1664,6 +1666,35 @@ class IoGenSLI(IoGenLI):
         IoGenLI.__init__(self, ed, svg, image_path,
                                      opref, tags, fields, did, note_tp)
 
+    def remove_backgrounds(self, sub_qwrappers_svg, hider_fill, big_qwrect_img, big_qwrect_area):
+        # bqwrect means big question wrapper rectangle
+        (bqwrect_left, bqwrect_top, bqwrect_right, bqwrect_bottom) = big_qwrect_area
+        (bqwrect_width, bqwrect_height) = (bqwrect_right - bqwrect_left, bqwrect_bottom - bqwrect_top)
+        new_bqwrect = Image.new('RGB', (int(bqwrect_width) + 1, int(bqwrect_height) + 1), hider_fill)
+        for sqw in sub_qwrappers_svg:
+            # calculate relative position for sub_qwrapper
+            (sqw_x, sqw_y, sqw_width, sqw_height) = (float(sqw.get('x')), float(sqw.get('y')), 
+                                                     float(sqw.get('width')), float(sqw.get('height')))
+            (sqw_left, sqw_top, sqw_right, sqw_bottom) = (sqw_x, sqw_y, # absolute coords
+                                                            sqw_x + sqw_width, sqw_y + sqw_height)
+            (sqw_left, sqw_top, sqw_right, sqw_bottom) = (sqw_left - bqwrect_left, # relative coords
+                                sqw_top - bqwrect_top, sqw_right - bqwrect_left, sqw_bottom - bqwrect_top) #bqwrect_right - sqw_right, bqwrect_bottom - sqw_bottom)
+            cropped_sqw = big_qwrect_img.crop((sqw_left, sqw_top, sqw_right, sqw_bottom))
+            new_bqwrect.paste(cropped_sqw, (int(sqw_left), int(sqw_top)))
+        return new_bqwrect
+
+    def create_mask_img_multi_wrapper(self, q_elm, fill, alpha_ch, q_wrapper_img, qwrapper_area):
+        """Process mask image"""
+        # PIL.Image.new() doesn't accept float coordinates, hence we're working with int coords.
+        (qe_width, qe_height) = (float(q_elm.get('width')), float(q_elm.get('height'))) # Error Raises if Reverse pattern is applied on regular layer
+        (qe_x, qe_y) = (float(q_elm.get('x')), float(q_elm.get('y'))) # qe means q_elm
+        q_mask = Image.new('RGB', (int(qe_width), int(qe_height)), fill)
+        q_mask.putalpha(alpha_ch)
+        # calculate relative position for q_mask
+        (qw_x, qw_y, _, _) = (qwrapper_area)
+        (left, top) = (int(qe_x-qw_x)+1, int(qe_y-qw_y)+1)
+        q_wrapper_img.paste(q_mask, (left, top), mask=q_mask)
+
     def get_mult_qwrapper_img(self, big_qrect_area, src_img):
         """Get big rectangle area for multiple qwrapper"""
         (left, top, right, bottom) = big_qrect_area
@@ -1671,6 +1702,13 @@ class IoGenSLI(IoGenLI):
         cropped_qw = src_img.crop(qw_crop_area)
         logging.debug(f'cropped_qw: {cropped_qw}')
         return cropped_qw
+
+    def get_surrounding_rect_from_sub_rects(self, sub_rects_svg):
+        big_rect_left = sorted([float(i.get('x')) for i in sub_rects_svg])[0] # smallest x
+        big_rect_top = sorted([float(i.get('y')) for i in sub_rects_svg])[0] # smallest y
+        big_rect_right = sorted([float(i.get('x'))+float(i.get('width')) for i in sub_rects_svg])[-1] # biggest x+width
+        big_rect_bottom = sorted([float(i.get('y'))+float(i.get('height')) for i in sub_rects_svg])[-1] # biggest y+height
+        return (big_rect_left, big_rect_top, big_rect_right, big_rect_bottom)
 
     def _generateMaskSVGsForRegular(self, side):
         """Generate a mask for each regular questions"""
@@ -1691,16 +1729,16 @@ class IoGenSLI(IoGenLI):
                 logging.debug(f'src_img: {src_img}')
                 q_wrapper = mlayer_node[q_elm_idx + 1]
                 if q_wrapper.tag == self._ns('rect'): # single qwrapper
+                    multi_wrapper = False
                     # get question wrapper img
                     cropped_qw_img = self.get_qwrapper_img(q_wrapper, src_img)
                 elif q_wrapper.tag == self._ns('g'): # multiple qwrapper
+                    multi_wrapper = True
                     sub_qwrappers = q_wrapper.findall('*')
-                    big_qrect_left = sorted([float(i.get('x')) for i in sub_qwrappers])[0]
-                    big_qrect_top = sorted([float(i.get('y')) for i in sub_qwrappers])[0]
-                    big_qrect_right = sorted([float(i.get('x'))+float(i.get('width')) for i in sub_qwrappers])[-1]
-                    big_qrect_bottom = sorted([float(i.get('y'))+float(i.get('height')) for i in sub_qwrappers])[-1]
-                    self.get_mult_qwrapper_img((big_qrect_left, big_qrect_top, big_qrect_right,
-                                                big_qrect_bottom), src_img)
+                    qwrects_big_wrapper_area = self.get_surrounding_rect_from_sub_rects(sub_qwrappers)
+        
+                    # get multiple question wrapper big rectangle img
+                    cropped_qw_img = self.get_mult_qwrapper_img(qwrects_big_wrapper_area, src_img)
 
                 q_elm = mlayer_node[q_elm_idx]
                 q_elm.set('class', 'qshape')
@@ -1708,14 +1746,20 @@ class IoGenSLI(IoGenLI):
                 if q_elm.get('fill'): # elms except g
                     q_elm.set('fill', self.qfill)
                     # process question image mask
-                    self.create_mask_img(q_elm, self.qfill, 255, cropped_qw_img, q_wrapper) # 255 means no transparency
+                    if not multi_wrapper:
+                        self.create_mask_img(q_elm, self.qfill, 255, cropped_qw_img, q_wrapper) # 255 means no transparency
+                    else:
+                        self.create_mask_img_multi_wrapper(q_elm, self.qfill, 255, cropped_qw_img, qwrects_big_wrapper_area)
                 else: # elms only g
                     for q_shape in q_elm.findall('*'):
                         if q_shape.get('fill') != 'none': # these are q shapes 
                             q_shape.set('class', 'qshape')
                             q_shape.set('fill', self.qfill)
                             # process multiple masked question image mask
-                            self.create_mask_img(q_shape, self.qfill, 255, cropped_qw_img, q_wrapper)
+                            if not multi_wrapper:
+                                self.create_mask_img(q_shape, self.qfill, 255, cropped_qw_img, q_wrapper)
+                            else:
+                                self.create_mask_img_multi_wrapper(q_shape, self.qfill, 255, cropped_qw_img, qwrects_big_wrapper_area)
                         else: # these are ommitting shapes, shape fill is set to none
                             q_shape.set('fill', self.hider_col)
                             q_shape.set('class', 'hider')
@@ -1741,9 +1785,18 @@ class IoGenSLI(IoGenLI):
                     if elm in preserved_shapes_ques:
                         elm.set('opacity', '1')
 
-                inversed_wrapper = self.inverse_wrapper(q_wrapper, svg_node, self.regular_inverse_fill)
-                svg_node.append(inversed_wrapper)
+                if multi_wrapper:
+                    # bqwrect means big question wrapper rectangle
+                    cropped_qw_img = self.remove_backgrounds(sub_qwrappers, self.hider_fill, 
+                                    cropped_qw_img, qwrects_big_wrapper_area)
+
+                # inversed_wrapper = self.inverse_wrapper(q_wrapper, svg_node, self.regular_inverse_fill)
+                # TODO implement svg wrapping, currently disabled with demo xml
+                # inversed_wrapper = '<svg width="1075" height="1519" xmlns="http://www.w3.org/2000/svg"></svg>'
+                # svg_node.append(inversed_wrapper)
                 xml = self.remove_namespace(ET.tostring(svg_node).decode('utf-8'))
+                # TODO implement svg wrapping, currently disabled with demo xml
+                # xml = '<svg width="1075" height="1519" xmlns="http://www.w3.org/2000/svg"></svg>'
                 masks.append(xml)
                 images_obj.append(cropped_qw_img)
 
@@ -1757,7 +1810,17 @@ class IoGenSLI(IoGenLI):
                     elm.set('opacity', '0')
 
                 q_wrapper = mlayer_node[q_elm_idx + 1]
-                cropped_qw_img = self.get_qwrapper_img(q_wrapper, src_img)
+                if q_wrapper.tag == self._ns('rect'): # single qwrapper
+                    multi_wrapper = False
+                    # get question wrapper img
+                    cropped_qw_img = self.get_qwrapper_img(q_wrapper, src_img)
+                elif q_wrapper.tag == self._ns('g'): # multiple qwrapper
+                    multi_wrapper = True
+                    sub_qwrappers = q_wrapper.findall('*')
+                    qwrects_big_wrapper_area = self.get_surrounding_rect_from_sub_rects(sub_qwrappers)
+        
+                    # get multiple question wrapper big rectangle img
+                    cropped_qw_img = self.get_mult_qwrapper_img(qwrects_big_wrapper_area, src_img)
 
                 q_elm = mlayer_node[q_elm_idx]
                 q_elm.set('class', 'ashape')
@@ -1765,14 +1828,20 @@ class IoGenSLI(IoGenLI):
                 if q_elm.get('fill'): # elms except g
                     # q_elm.set('fill', self.qfill)
                     # process answer image mask
-                    self.create_mask_img(q_elm, self.afill, 50, cropped_qw_img, q_wrapper)
+                    if not multi_wrapper:
+                        self.create_mask_img(q_elm, self.afill, 50, cropped_qw_img, q_wrapper) # 255 means no transparency
+                    else:
+                        self.create_mask_img_multi_wrapper(q_elm, self.afill, 50, cropped_qw_img, qwrects_big_wrapper_area)
                 else: # elms only g
                     for q_shape in q_elm.findall('*'):
                         if q_shape.get('fill') != 'none': # these are q shapes 
                             q_shape.set('class', 'ashape')
                             # q_shape.set('fill', self.qfill)
                             # process multiple masked answer image mask
-                            self.create_mask_img(q_shape, self.afill, 50, cropped_qw_img, q_wrapper)
+                            if not multi_wrapper:
+                                self.create_mask_img(q_shape, self.afill, 50, cropped_qw_img, q_wrapper)
+                            else:
+                                self.create_mask_img_multi_wrapper(q_shape, self.afill, 50, cropped_qw_img, qwrects_big_wrapper_area)
                             
                         else: # these are ommitting shapes, shape fill is set to none
                             q_shape.set('fill', self.hider_col)
@@ -1802,10 +1871,18 @@ class IoGenSLI(IoGenLI):
                         else:
                             elm.set('opacity', '0.3')
 
-                # q_wrapper = mlayer_node[q_elm_idx + 1]
-                inversed_wrapper = self.inverse_wrapper(q_wrapper, svg_node, self.regular_inverse_fill)
-                svg_node.append(inversed_wrapper)
+                if multi_wrapper:
+                    # bqwrect means big question wrapper rectangle
+                    cropped_qw_img = self.remove_backgrounds(sub_qwrappers, self.hider_fill, 
+                                    cropped_qw_img, qwrects_big_wrapper_area)
+
+                # inversed_wrapper = self.inverse_wrapper(q_wrapper, svg_node, self.regular_inverse_fill)
+                # TODO implement svg wrapping, currently disabled with demo xml
+                # inversed_wrapper = '<svg width="1075" height="1519" xmlns="http://www.w3.org/2000/svg"></svg>'
+                # svg_node.append(inversed_wrapper)
                 xml = self.remove_namespace(ET.tostring(svg_node).decode('utf-8'))
+                # TODO implement svg wrapping, currently disabled with demo xml
+                # xml = '<svg width="1075" height="1519" xmlns="http://www.w3.org/2000/svg"></svg>'
                 masks.append(xml)
                 images_obj.append(cropped_qw_img)
         return masks, images_obj

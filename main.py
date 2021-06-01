@@ -217,6 +217,7 @@ def onProfileLoaded():
     getOrCreateModel(IO_MODELS_MAP['oa'])
     getOrCreateModel(IO_MODELS_MAP['si'])
     getOrCreateModel(IO_MODELS_MAP['li'])
+    getOrCreateModel(IO_MODELS_MAP['sli'])
 
 
 # Mask toggle hotkey

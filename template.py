@@ -941,6 +941,11 @@ def add_io_model(col, model_map):
       template['afmt'] = iocard_back_li
       io_model['css'] = iocard_css_li
       io_model['sortf'] = 1
+    elif model_map['short_name'] == 'sli':
+      template['qfmt'] = iocard_front_sli
+      template['afmt'] = iocard_back_sli
+      io_model['css'] = iocard_css_sli
+      io_model['sortf'] = 1
       
     logging.debug(f'template: {template}')
     models.addTemplate(io_model, template)

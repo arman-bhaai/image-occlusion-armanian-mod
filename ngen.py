@@ -1897,11 +1897,11 @@ class IoGenSLI(IoGenLI):
         masks = []
         images_obj = []
         src_img = Image.open(self.image_path)
-        src_img_copy = src_img.copy()
 
         if side == 'Q':
             for q_g_idx in self.rnode_ids.keys(): # g is question set
                 for q_elm_idx in self.rnode_ids[q_g_idx]:
+                    src_img_copy = src_img.copy()
                     svg_node = ET.fromstring(self.new_svg)
                     layer_nodes = self._layerNodesFrom(svg_node)
                     rlayer_node = layer_nodes[-2]  # treat 2nd topmost layer as reverse masks layer
@@ -1918,32 +1918,26 @@ class IoGenSLI(IoGenLI):
                     if q_elm.get('fill'): # elms except g
                         q_elm.set('fill', self.rev_qfill)
                         # process question image mask
-                        if not multi_wrapper:
-                            self.create_mask_img(q_elm, self.rev_qfill, 255, cropped_qw_img, q_wrapper) # 255 means no transparency
-                        else:
-                            self.create_mask_img_multi_wrapper(q_elm, self.rev_qfill, 255, cropped_qw_img, qwrects_big_wrapper_area)
+                        self.create_mask_img(q_elm, self.rev_qfill, 255, src_img_copy) # 255 means no transparency
                     else: # elms only g
                         for q_shape in q_elm.findall('*'):
                             q_shape.set('class', 'qshape')
                             q_shape.set('fill', self.rev_qfill)
                             # process multiple masked question image mask
-                            if not multi_wrapper:
-                                self.create_mask_img(q_shape, self.rev_qfill, 255, cropped_qw_img, q_wrapper)
-                            else:
-                                self.create_mask_img_multi_wrapper(q_shape, self.rev_qfill, 255, cropped_qw_img, qwrects_big_wrapper_area)
+                            self.create_mask_img(q_shape, self.rev_qfill, 255, src_img_copy)
 
                     q_wrapper = rlayer_node[q_g_idx + 1]
                     if q_wrapper.tag == self._ns('rect'): # single qwrapper
                         multi_wrapper = False
                         # get question wrapper img
-                        cropped_qw_img = self.get_qwrapper_img(q_wrapper, src_img)
+                        cropped_qw_img = self.get_qwrapper_img(q_wrapper, src_img_copy)
                     elif q_wrapper.tag == self._ns('g'): # multiple qwrapper
                         multi_wrapper = True
                         sub_qwrappers = q_wrapper.findall('*')
                         qwrects_big_wrapper_area = self.get_surrounding_rect_from_sub_rects(sub_qwrappers)
             
                         # get multiple question wrapper big rectangle img
-                        cropped_qw_img = self.get_mult_qwrapper_img(qwrects_big_wrapper_area, src_img)
+                        cropped_qw_img = self.get_mult_qwrapper_img(qwrects_big_wrapper_area, src_img_copy)
                         
                     # preserved elms -> root, layers, titles, current q elms
                     preserved_shapes_all = [svg_node, svg_node[0], svg_node[0][0], svg_node[1], 
@@ -1970,7 +1964,7 @@ class IoGenSLI(IoGenLI):
                                 elm.set('fill', self.hider_col)
                                 elm.set('class', 'hider')
                                 # process hider image mask
-                                self.create_mask_img(elm, self.hider_fill, 255, cropped_qw_img, q_wrapper)
+                                self.create_mask_img(elm, self.hider_fill, 255, src_img_copy)
 
                     if multi_wrapper:
                         # bqwrect means big question wrapper rectangle
@@ -1986,25 +1980,13 @@ class IoGenSLI(IoGenLI):
         elif side == 'A':
             for q_g_idx in self.rnode_ids.keys(): # g is question set
                 for q_elm_idx in self.rnode_ids[q_g_idx]:
+                    src_img_copy = src_img.copy()
                     svg_node = ET.fromstring(self.new_svg)
                     layer_nodes = self._layerNodesFrom(svg_node)
                     rlayer_node = layer_nodes[-2]  # treat 2nd topmost layer as reverse masks layer
 
                     for elm in svg_node.iter(): # hide all shapes from root
                         elm.set('opacity', '0')
-
-                    q_wrapper = rlayer_node[q_g_idx + 1]
-                    if q_wrapper.tag == self._ns('rect'): # single qwrapper
-                        multi_wrapper = False
-                        # get question wrapper img
-                        cropped_qw_img = self.get_qwrapper_img(q_wrapper, src_img)
-                    elif q_wrapper.tag == self._ns('g'): # multiple qwrapper
-                        multi_wrapper = True
-                        sub_qwrappers = q_wrapper.findall('*')
-                        qwrects_big_wrapper_area = self.get_surrounding_rect_from_sub_rects(sub_qwrappers)
-            
-                        # get multiple question wrapper big rectangle img
-                        cropped_qw_img = self.get_mult_qwrapper_img(qwrects_big_wrapper_area, src_img)
 
                     qset_elm = rlayer_node[q_g_idx]
                     qset_elm.set('class', 'qset')
@@ -2013,20 +1995,27 @@ class IoGenSLI(IoGenLI):
                     if q_elm.get('fill'): # elms except g
                         q_elm.set('fill', self.rev_afill)
                         # process answer image mask
-                        if not multi_wrapper:
-                            self.create_mask_img(q_elm, self.rev_afill, 50, cropped_qw_img, q_wrapper) # 255 means no transparency
-                        else:
-                            self.create_mask_img_multi_wrapper(q_elm, self.rev_afill, 50, cropped_qw_img, qwrects_big_wrapper_area)
+                        self.create_mask_img(q_elm, self.rev_afill, 50, src_img_copy) # 255 means no transparency
                     else: # elms only g
                         for q_shape in q_elm.findall('*'):
                             q_shape.set('class', 'qshape')
                             q_shape.set('fill', self.rev_afill)
                             # process multiple masked answer image mask
-                            if not multi_wrapper:
-                                self.create_mask_img(q_shape, self.rev_afill, 50, cropped_qw_img, q_wrapper)
-                            else:
-                                self.create_mask_img_multi_wrapper(q_shape, self.rev_afill, 50, cropped_qw_img, qwrects_big_wrapper_area)
+                            self.create_mask_img(q_shape, self.rev_afill, 50, src_img_copy)
 
+                    q_wrapper = rlayer_node[q_g_idx + 1]
+                    if q_wrapper.tag == self._ns('rect'): # single qwrapper
+                        multi_wrapper = False
+                        # get question wrapper img
+                        cropped_qw_img = self.get_qwrapper_img(q_wrapper, src_img_copy)
+                    elif q_wrapper.tag == self._ns('g'): # multiple qwrapper
+                        multi_wrapper = True
+                        sub_qwrappers = q_wrapper.findall('*')
+                        qwrects_big_wrapper_area = self.get_surrounding_rect_from_sub_rects(sub_qwrappers)
+            
+                        # get multiple question wrapper big rectangle img
+                        cropped_qw_img = self.get_mult_qwrapper_img(qwrects_big_wrapper_area, src_img_copy)
+                    
                     # preserved elms -> root, layers, titles, current q elms
                     preserved_shapes_all = [svg_node, svg_node[0], svg_node[0][0], svg_node[1], 
                                         svg_node[1][0], svg_node[2], svg_node[2][0], qset_elm]
@@ -2053,7 +2042,7 @@ class IoGenSLI(IoGenLI):
                                 elm.set('fill', self.hider_col)
                                 elm.set('class', 'hider')
                                 # process hider image mask
-                                self.create_mask_img(elm, self.hider_fill, 255, cropped_qw_img, q_wrapper)
+                                self.create_mask_img(elm, self.hider_fill, 255, src_img_copy)
 
                     if multi_wrapper:
                         # bqwrect means big question wrapper rectangle

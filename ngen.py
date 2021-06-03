@@ -1224,34 +1224,21 @@ class IoGenLI(IoGenSI):
             mw.col.addNote(note)
             logging.debug("!notecreate %s", note)
 
-    # def create_mask_img(self, q_elm, fill, alpha_ch, q_wrapper_img, q_wrapper_svg):
-    #     """Process mask image"""
-    #     # PIL.Image.new() doesn't accept float coordinates, hence we're working with int coords.
-    #     (qe_width, qe_height) = (float(q_elm.get('width')), float(q_elm.get('height'))) # Error Raises if Reverse pattern is applied on regular layer
-    #     (qe_x, qe_y) = (float(q_elm.get('x')), float(q_elm.get('y'))) # qe means q_elm
-    #     q_mask = Image.new('RGB', (int(qe_width), int(qe_height)), fill)
-    #     q_mask.putalpha(alpha_ch)
-    #     # rotate image
-    #     if q_elm.get('transform'):
-    #         angle = float(q_elm.get('transform').split()[0].split('(')[1])
-    #         q_mask = q_mask.rotate(-angle, expand=True)
-    #     # calculate relative position for q_mask
-    #     (qw_x, qw_y) = (float(q_wrapper_svg.get('x')), float(q_wrapper_svg.get('y')))
-    #     (left, top) = (int(qe_x-qw_x)+1, int(qe_y-qw_y)+1)
-    #     q_wrapper_img.paste(q_mask, (left, top), mask=q_mask)
-
-    def create_mask_img(self, q_elm, fill, alpha_ch, src_img):
+    def create_mask_img(self, q_elm, fill, alpha_ch, q_wrapper_img, q_wrapper_svg):
         """Process mask image"""
         # PIL.Image.new() doesn't accept float coordinates, hence we're working with int coords.
         (qe_width, qe_height) = (float(q_elm.get('width')), float(q_elm.get('height'))) # Error Raises if Reverse pattern is applied on regular layer
         (qe_x, qe_y) = (float(q_elm.get('x')), float(q_elm.get('y'))) # qe means q_elm
-        q_mask = Image.new('RGB', (int(qe_width)+1, int(qe_height)+1), fill)
+        q_mask = Image.new('RGB', (int(qe_width), int(qe_height)), fill)
         q_mask.putalpha(alpha_ch)
         # rotate image
         if q_elm.get('transform'):
             angle = float(q_elm.get('transform').split()[0].split('(')[1])
             q_mask = q_mask.rotate(-angle, expand=True)
-        src_img.paste(q_mask, (int(qe_x)+1, int(qe_y)+1), mask=q_mask)
+        # calculate relative position for q_mask
+        (qw_x, qw_y) = (float(q_wrapper_svg.get('x')), float(q_wrapper_svg.get('y')))
+        (left, top) = (int(qe_x-qw_x)+1, int(qe_y-qw_y)+1)
+        q_wrapper_img.paste(q_mask, (left, top), mask=q_mask)
 
     def get_qwrapper_img(self, q_wrapper, src_img):
         (qw_x, qw_y, qw_width, qw_height) = (float(q_wrapper.get('x')), float(q_wrapper.get('y')), # qw means q_wrapper
@@ -1710,6 +1697,19 @@ class IoGenSLI(IoGenLI):
         (qw_x, qw_y, _, _) = (qwrapper_area)
         (left, top) = (int(qe_x-qw_x)+1, int(qe_y-qw_y)+1)
         q_wrapper_img.paste(q_mask, (left, top), mask=q_mask)
+
+    def create_mask_img(self, q_elm, fill, alpha_ch, src_img):
+        """Process mask image"""
+        # PIL.Image.new() doesn't accept float coordinates, hence we're working with int coords.
+        (qe_width, qe_height) = (float(q_elm.get('width')), float(q_elm.get('height'))) # Error Raises if Reverse pattern is applied on regular layer
+        (qe_x, qe_y) = (float(q_elm.get('x')), float(q_elm.get('y'))) # qe means q_elm
+        q_mask = Image.new('RGB', (int(qe_width)+1, int(qe_height)+1), fill)
+        q_mask.putalpha(alpha_ch)
+        # rotate image
+        if q_elm.get('transform'):
+            angle = float(q_elm.get('transform').split()[0].split('(')[1])
+            q_mask = q_mask.rotate(-angle, expand=True)
+        src_img.paste(q_mask, (int(qe_x)+1, int(qe_y)+1), mask=q_mask)
 
     def get_mult_qwrapper_img(self, big_qrect_area, src_img):
         """Get big rectangle area for multiple qwrapper"""

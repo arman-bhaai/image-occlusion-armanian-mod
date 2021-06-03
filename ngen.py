@@ -1231,6 +1231,10 @@ class IoGenLI(IoGenSI):
         (qe_x, qe_y) = (float(q_elm.get('x')), float(q_elm.get('y'))) # qe means q_elm
         q_mask = Image.new('RGB', (int(qe_width), int(qe_height)), fill)
         q_mask.putalpha(alpha_ch)
+        # rotate image
+        if q_elm.get('transform'):
+            angle = float(q_elm.get('transform').split()[0].split('(')[1])
+            q_mask = q_mask.rotate(-angle, expand=True)
         # calculate relative position for q_mask
         (qw_x, qw_y) = (float(q_wrapper_svg.get('x')), float(q_wrapper_svg.get('y')))
         (left, top) = (int(qe_x-qw_x)+1, int(qe_y-qw_y)+1)

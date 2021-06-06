@@ -202,6 +202,7 @@ default_conf_syncd = {'version': 0.02,
                       'rev_afill': '064420', # fill for reverse answer masks
                       'hider_fill': 'FFFFFF',
                       'ed_fill_opacity': 0.2, # fill opacity for masks in svg editor
+                      'blankq_fill': '293b5f', # fill opacity for blank question image
                       'scol': '2D2D2D',
                       'swidth': 3,
                       'font': 'Arial',

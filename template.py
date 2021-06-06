@@ -804,7 +804,7 @@ iocard_css_sli = """\
 
 /* OCCLUSION CSS START - don't edit this */
 #io-overlay {
-  position:absolute;
+  position:relative;
   top:0;
   width:100%;
   z-index:3

@@ -81,6 +81,7 @@ class ImgOccNoteGenerator(object):
         self.afill = '#' + mw.col.conf['imgocc_armod']['afill'] # fill for answer masks
         self.rev_afill = '#' + mw.col.conf['imgocc_armod']['rev_afill'] # fill for reverse answer masks
         self.hider_fill = '#' + mw.col.conf['imgocc_armod']['hider_fill']
+        self.blankq_fill= '#' + mw.col.conf['imgocc_armod']['blankq_fill'] # fill for blank question image
         self.note_tp = note_tp
         loadConfig(self)
         self.mconfig = self.mconfigs[self.note_tp] # model config
@@ -542,17 +543,6 @@ class IoGenSI(ImgOccNoteGenerator):
         self.regular_inverse_fill = '#2b2c2e'
         self.reverse_inverse_fill = '#414c61'
 
-    def _save_img(self, img_obj, note_id, mtype, blank_q=False):
-        """Write image in media collection"""
-        logging.debug("!saving %s, %s", note_id, mtype)
-        # media collection is the working directory:
-        if not blank_q: # this question in a real
-            img_path = '%s-%s.png' % (note_id, mtype)
-        else: # this is a blank question
-            img_path = 'blank-img.png'
-        img_obj.save(img_path)
-        return img_path
-
     def _showUpdateTooltip(self, del_count, new_count):
         upd_count = max(0, len(self.mnode_ids) - del_count - new_count)
         ttip = "%s old %s <b>edited in place</b>" % self._cardS(upd_count)
@@ -749,7 +739,6 @@ class IoGenSI(ImgOccNoteGenerator):
 
     def updateNotes(self):
         """Update existing notes"""
-        input('hello')
         state = "default"
         self.uniq_id = self.opref['uniq_id']
         self.occl_id = '%s-%s' % (self.uniq_id, self.occl_tp)
@@ -1242,7 +1231,7 @@ class IoGenLI(IoGenSI):
                                      
 
     def _saveMaskAndReturnNote(self, omask_path, qmask, amask, img_obj_q, img_obj_a,
-                               img, note_id, nid=None, blank_q=False):
+                               img, note_id, nid=None):
         """Write actual note for given qmask and amask"""
         fields = self.fields
         model = self.mconfig['model']
@@ -1251,8 +1240,8 @@ class IoGenLI(IoGenSI):
         fields[ioflds['im']] = img
         if omask_path:
             # Occlusions updated
-            q_img_path = self._save_img(img_obj_q, note_id, 'Q', blank_q)
-            a_img_path = self._save_img(img_obj_a, note_id, 'A', blank_q)
+            q_img_path = self._save_img(img_obj_q, note_id, 'Q')
+            a_img_path = self._save_img(img_obj_a, note_id, 'A')
             fields[ioflds['q_img']] = fname2img(q_img_path)
             fields[ioflds['a_img']] = fname2img(a_img_path)
             qmask_path = self._saveMask(qmask, note_id, "Q")
@@ -1683,7 +1672,7 @@ class IoGenLI(IoGenSI):
             logging.debug("nid %s", nid)
             if omask_path:
                 if not q_nid:
-                    self._saveMaskAndReturnNote(omask_path, blank_qmasks[nr], blank_amasks[nr], blank_images_obj_q[nr], blank_images_obj_a[nr], img, note_id, blank_q=True)
+                    self._saveMaskAndReturnNote(omask_path, blank_qmasks[nr], blank_amasks[nr], blank_images_obj_q[nr], blank_images_obj_a[nr], img, note_id)
             else:
                 self._saveMaskAndReturnNote(None, None, None,
                                             img, note_id, nid)
@@ -1748,7 +1737,7 @@ class IoGenLI(IoGenSI):
         # add blank questions
         for nr, idx in enumerate(self.bnode_ids.keys()):
             note_id = self.bnode_ids[idx]
-            self._saveMaskAndReturnNote(omask_path, blank_qmasks[nr], blank_amasks[nr], blank_images_obj_q[nr], blank_images_obj_a[nr], img, note_id, blank_q=True)
+            self._saveMaskAndReturnNote(omask_path, blank_qmasks[nr], blank_amasks[nr], blank_images_obj_q[nr], blank_images_obj_a[nr], img, note_id)
 
         tooltip(f"{len(reg_qmasks)+len(rev_qmasks)+len(blank_qmasks)} cards <b>added.</b><br> \
             regular: {len(reg_qmasks)}<br>reverse: {len(rev_qmasks)}<br>blank: {len(blank_qmasks)}", parent=None)
@@ -2163,7 +2152,7 @@ class IoGenSLI(IoGenLI):
         src_img_copy = src_img.copy()
 
         # blank image for q and a
-        blank_im = Image.new('RGB', (200, 100), '#185adb')
+        blank_im = Image.new('RGB', (200, 50), self.blankq_fill)
         
         if side == 'Q':
             for q_elm_idx in self.bnode_ids.keys(): # elm is a rect

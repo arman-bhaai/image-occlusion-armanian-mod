@@ -169,7 +169,7 @@ class ImgOccEdit(QDialog):
                                            QDialogButtonBox.ActionRole)
         self.li_btn = button_box.addButton("Process &Long Image",
                                            QDialogButtonBox.ActionRole)
-        self.sli_btn = button_box.addButton("Process S&implified Long Image",
+        self.sli_btn = button_box.addButton("Process Simplified Long Im&age",
                                            QDialogButtonBox.ActionRole)
         close_button = button_box.addButton("&Close",
                                             QDialogButtonBox.RejectRole)

@@ -35,6 +35,7 @@ from .config import ed_fill_opacity
 from .editor import ImgOccEdit
 from .dialogs import ioCritical, ioInfo
 from .utils import imageProp, img2path, path2url
+from PIL import Image
 
 from .consts import SUPPORTED_EXTENSIONS
 
@@ -99,7 +100,10 @@ class ImgOccAdd(object):
         self.image_path = image_path
 
         try:
-            width, height = imageProp(image_path)
+            # width, height = imageProp(image_path)
+            # FIXME a bug arises from above line. image height counts as 1. hence, we're using code below
+            im = Image.open(image_path)
+            (width, height) = im.size
         except ValueError as e:
             showWarning(
                 f"<b>Unsupported image</b> in file <i>{image_path}</i>:"
@@ -269,7 +273,10 @@ class ImgOccAdd(object):
         if not image_path:
             return False
         try:
-            width, height = imageProp(image_path)
+            # width, height = imageProp(image_path)
+            # FIXME a bug arises from above line. image height counts as 1. hence, we're using code below
+            im = Image.open(image_path)
+            (width, height) = im.size
         except ValueError as e:
             showWarning(
                 f"<b>Unsupported image</b> in file <i>{image_path}</i>:"

@@ -4103,6 +4103,7 @@
 					// Additional shortcuts
 					{key: ['esc', true, true], fn: svgCanvas.clearSelection},
 					{key: 'ctrl+shift+L', fn: function(){$('#layerlist td.layername:contains("Labels"):last').trigger("mouseup")}},
+					{key: 'ctrl+shift+B', fn: function(){$('#layerlist td.layername:contains("BlankQ"):last').trigger("mouseup")}}, ///@ add oneln
 					{key: 'ctrl+shift+D', fn: function(){$('#layerlist td.layername:contains("ReverseQ"):last').trigger("mouseup")}}, ///@ add oneln
 					{key: 'ctrl+shift+M', fn: function(){$('#layerlist td.layername:contains("Masks"):last').trigger("mouseup")}}
 

@@ -196,8 +196,8 @@ default_conf_local = {'version': 0.02,
                       'hotkey': IO_HOTKEY}
 default_conf_syncd = {'version': 0.02,
                       'ofill': '7f007f',
-                      'qfill': 'FF7E7E', # fill for regular question masks
-                      'rev_qfill': 'FF7E7E', # fill for reverse question masks
+                      'qfill': '393e46', # fill for regular question masks
+                      'rev_qfill': '393e46', # fill for reverse question masks
                       'afill': '185adb', # fill for answer masks
                       'rev_afill': '064420', # fill for reverse answer masks
                       'hider_fill': 'FFFFFF',

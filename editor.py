@@ -78,7 +78,7 @@ class ImgOccWebView(webview.AnkiWebView):
 class ImgOccEdit(QDialog):
     """Main Image Occlusion Editor dialog"""
 
-    def __init__(self, imgoccadd, parent, model_map, note_tp):
+    def __init__(self, imgoccadd, parent, model_map, note_tp, img_path):
         QDialog.__init__(self)
         mw.setupDialogGC(self)
         self.setWindowFlags(Qt.Window)
@@ -87,6 +87,7 @@ class ImgOccEdit(QDialog):
         self.parent = parent
         self.mode = "add"
         self.note_tp = note_tp
+        self.img_path = img_path
         loadConfig(self)
         self.model_map = model_map
         self.mconfig = self.mconfigs[model_map['short_name']]
@@ -281,7 +282,9 @@ class ImgOccEdit(QDialog):
         QShortcut(QKeySequence("Ctrl+Return"),
                   self).activated.connect(lambda: self.defaultAction(True))
         QShortcut(QKeySequence("Ctrl+Shift+Return"),
-                  self).activated.connect(lambda: self.addOA(True))
+                  self).activated.connect(lambda: self.defaultAction(False))
+        # QShortcut(QKeySequence("Ctrl+Shift+Return"),
+        #           self).activated.connect(lambda: self.addOA(True))
         QShortcut(QKeySequence("Ctrl+Alt+Return"),
                   self).activated.connect(lambda: self.add_si(True))
         QShortcut(QKeySequence("Ctrl+Alt+Shift+Return"),
@@ -433,7 +436,7 @@ class ImgOccEdit(QDialog):
             ttl = "Image Occlusion ArMOD - Editing Mode"
             bl_txt = "Type:"
         self.deckChooser.deckLabel.setText(dl_txt)
-        self.setWindowTitle(ttl)
+        self.setWindowTitle(ttl + ' :: ' + self.img_path)
         self.bottom_label.setText(bl_txt)
 
     def showSvgEdit(self, state):

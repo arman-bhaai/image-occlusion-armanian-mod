@@ -740,7 +740,12 @@ iocard_front_sli = """\
 
 {{#%(src_img)s}}
 <div id="io-header">{{%(header)s}}</div>
-<div id="io-qextra">{{%(ext_q)s}}</div>
+<div class="io-extra">
+  {{#%(ext_q)s}}
+  <div id="io-qextra">{{%(ext_q)s}}</div>
+  {{/%(ext_q)s}}
+  <br>
+</div>
 <div id="io-wrapper">
   <div id="io-overlay">{{%(q_img)s}}</div>
 </div>
@@ -760,9 +765,12 @@ iocard_front_sli = """\
 iocard_back_sli = """\
 {{#%(src_img)s}}
 <div id="io-header">{{%(header)s}}</div>
-{{#%(ext_q)s}}
-<div id="io-qextra">{{%(ext_q)s}}</div>
-{{/%(ext_q)s}}
+<div class="io-extra">
+  {{#%(ext_q)s}}
+  <div id="io-qextra">{{%(ext_q)s}}</div>
+  {{/%(ext_q)s}}
+  <br>
+</div>
 <div id="io-wrapper">
   <div id="io-overlay">{{%(a_img)s}}</div>
 </div>
@@ -770,12 +778,12 @@ iocard_back_sli = """\
   <div id="io-extra">
     {{#%(ext_a)s}}
     <div id="io-aextra">
-      <div class="io-field-descr">%(ext_a)s</div>{{%(ext_a)s}}
+      <div class="io-field-descr">:: %(ext_a)s ::</div>{{%(ext_a)s}}
     </div>
     {{/%(ext_a)s}}
     {{#%(ext_mnem)s}}
     <div id="io-mnemonics">
-      <div class="io-field-descr">%(ext_mnem)s</div>{{%(ext_mnem)s}}
+      <div class="io-field-descr">:: %(ext_mnem)s ::</div>{{%(ext_mnem)s}}
     </div>
     {{/%(ext_mnem)s}}
   </div>
@@ -794,9 +802,18 @@ iocard_back_sli = """\
 
 iocard_css_sli = """\
 /* GENERAL CARD STYLE */
+
+@font-face {
+  font-family: 'bnfont';
+  src: url('https://fonts.maateen.me/kalpurush/Kalpurush.woff');
+  src: url('https://fonts.maateen.me/solaiman-lipi/SolaimanLipi.woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .card {
-  font-family: "Helvetica LT Std", Helvetica, Arial, Sans;
-  font-size: 150%;
+  font-family: SolaimanLipi, bnfont, "Helvetica LT Std", Helvetica, Arial, Sans;
+  font-size: 170%;
   text-align: center;
   color: black;
   background-color: white;
@@ -825,14 +842,15 @@ iocard_css_sli = """\
 #io-qextra, #io-aextra, #io-mnemonics{
   /* the wrapper is needed to center the
   left-aligned blocks below it */
-  width: 80%;
+  width: 100%;
   margin-left: auto;
   margin-right: auto;
   margin-top: 0.5em;
+  text-align: left;
 }
 
-#io-extra{
-  text-align:center;
+#io-extra, .io-extra {
+  text-align: left;
   display: inline-block;
 }
 
@@ -843,9 +861,11 @@ iocard_css_sli = """\
 }
 
 .io-field-descr{
-  margin-bottom: 0.2em;
+  margin-bottom: 0.5em;
   font-weight: bold;
-  font-size: 1em;
+  font-size: 0.8em;
+  text-decoration: underline;
+  font-style: italic
 }
 
 #io-revl-btn {

@@ -204,7 +204,7 @@ class ImgOccAdd(object):
         flds = self.mconfig['mflds']
         deck = mw.col.decks.nameOrNone(opref["did"])
 
-        dialog = ImgOccEdit(self, self.ed.parentWindow, self.model_map, self.note_tp)
+        dialog = ImgOccEdit(self, self.ed.parentWindow, self.model_map, self.note_tp, self.image_path)
         dialog.setupFields(flds)
         dialog.switchToMode(self.mode)
         self.imgoccedit = dialog

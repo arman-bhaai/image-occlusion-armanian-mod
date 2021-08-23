@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 wait for upcoming version...
 
+## [0.0.7] - 2021-06-23
+### [Download](https://github.com/arman-bhaai/image-occlusion-armanian-mod/releases/tag/v0.0.7)
+### Added:
+- Bengali (SolaimanLipi) font support
+
 ## [0.0.6] - 2021-06-07
 ### [Download](https://github.com/arman-bhaai/image-occlusion-armanian-mod/releases/tag/v0.0.6)
 ### Added:
@@ -37,7 +42,8 @@ wait for upcoming version...
 - changelog file
 - gitignore file
 
-[Unreleased]: https://github.com/arman-bhaai/image-occlusion-armanian-mod/compare/v0.0.6...HEAD
+[Unreleased]: https://github.com/arman-bhaai/image-occlusion-armanian-mod/compare/v0.0.7...HEAD
+[0.0.7]: https://github.com/arman-bhaai/image-occlusion-armanian-mod/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/arman-bhaai/image-occlusion-armanian-mod/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/arman-bhaai/image-occlusion-armanian-mod/compare/v0.0.4...v0.0.5
 [0.0.4]: https://github.com/arman-bhaai/image-occlusion-armanian-mod/compare/v0.0.3...v0.0.4

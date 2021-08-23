@@ -1,12 +1,12 @@
 {
-    "name": "Image Occlusion Enhanced",
-    "package": "1374772155",
-    "ankiweb_id": "1374772155",
-    "author": "Glutanimate",
-    "version": "v1.3.0-alpha6",
-    "homepage": "https://github.com/glutanimate/image-occlusion-enhanced",
+    "name": "Image Occlusion Armanian Mod",
+    "package": "10101010101010",
+    "ankiweb_id": "10101010101010",
+    "author": "Abu Bakar Siddique Arman",
+    "version": "v0.0.7",
+    "homepage": "https://github.com/arman-bhaai/image-occlusion-armaninan-mod",
     "conflicts": [
-        "image_occlusion_enhanced"
+        "image_occlusion_armod"
     ],
     "mod": 1588040218
 }

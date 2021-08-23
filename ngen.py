@@ -633,7 +633,7 @@ class IoGenSI(ImgOccNoteGenerator):
                     # increment maximum note_id number
                     note_nr_max = note_nr_max + 1
                     note_nr = note_nr_max
-                new_mnode_id = self.occl_id +'-card_'+ str(note_nr)+ '-regularq_qedt'  # edt means cards created by editing
+                new_mnode_id = self.occl_id +'-card_'+ str(note_nr).zfill(3)+ '-regularq_qedt'  # edt means cards created by editing
                 new_count += 1
                 nids[new_mnode_id] = None
 
@@ -1118,7 +1118,7 @@ class IoGenSI(ImgOccNoteGenerator):
             if mnode.tag != self._ns('title'):
                 if i%2 == 1: # this is a question
                     if not edit:
-                        self.mnode_ids[i] = "%s-card_%i-regularq_q%i" % (self.occl_id, count_card, count_ques)
+                        self.mnode_ids[i] = "%s-card_%s-regularq_q%i" % (self.occl_id, str(count_card).zfill(3), count_ques)
                         mnode.set("id", self.mnode_ids[i])
                     else:
                         self.mnode_ids[i] = mnode.get('id')
@@ -1144,7 +1144,7 @@ class IoGenSI(ImgOccNoteGenerator):
                     for idx_q_elm, q_elm in enumerate(rnode.findall('*')): # this is a question / hider -> rect / g / hider-rect
                         if not edit:
                             if not q_elm.get('fill') == 'none': # q elms except hider-rects
-                                q_elm_id = "%s-card_%i-revereseq_qset%i_q%i" % (self.occl_id, count_card, count_ques, idx_q_elm+1) 
+                                q_elm_id = "%s-card_%s-revereseq_qset%i_q%i" % (self.occl_id, str(count_card).zfill(3), count_ques, idx_q_elm+1) 
                                 q_elm.set('id', q_elm_id)
                                 self.rnode_ids[idx_rnode][idx_q_elm] = q_elm_id
                                 count_card += 1
@@ -1818,10 +1818,10 @@ class IoGenSLI(IoGenLI):
         masks = []
         images_obj = []
         src_img = Image.open(self.image_path)
-        src_img_copy = src_img.copy()
         
         if side == 'Q':
             for q_elm_idx in self.mnode_ids.keys(): # elm might be rect/g/path/shape
+                src_img_copy = src_img.copy()
                 svg_node = ET.fromstring(self.new_svg)
                 layer_nodes = self._layerNodesFrom(svg_node)
                 mlayer_node = layer_nodes[-1]  # treat topmost layer as masks layer
@@ -1901,6 +1901,7 @@ class IoGenSLI(IoGenLI):
 
         elif side == 'A':
             for q_elm_idx in self.mnode_ids.keys(): # elm might be rect/g/path/shape
+                src_img_copy = src_img.copy()
                 svg_node = ET.fromstring(self.new_svg)
                 layer_nodes = self._layerNodesFrom(svg_node)
                 mlayer_node = layer_nodes[-1]  # treat topmost layer as masks layer
@@ -2149,13 +2150,13 @@ class IoGenSLI(IoGenLI):
         masks = []
         images_obj = []
         src_img = Image.open(self.image_path)
-        src_img_copy = src_img.copy()
 
         # blank image for q and a
         blank_im = Image.new('RGB', (200, 50), self.blankq_fill)
         
         if side == 'Q':
             for q_elm_idx in self.bnode_ids.keys(): # elm is a rect
+                src_img_copy = src_img.copy()
                 svg_node = ET.fromstring(self.new_svg)
                 layer_nodes = self._layerNodesFrom(svg_node)
                 blayer_node = layer_nodes[-3]  # treat topmost 3rd layer as blankQ masks layer
@@ -2200,6 +2201,7 @@ class IoGenSLI(IoGenLI):
 
         elif side == 'A':
             for q_elm_idx in self.bnode_ids.keys(): # elm is a rect
+                src_img_copy = src_img.copy()
                 svg_node = ET.fromstring(self.new_svg)
                 layer_nodes = self._layerNodesFrom(svg_node)
                 blayer_node = layer_nodes[-3]  # treat topmost 3rd layer as blankQ masks layer
